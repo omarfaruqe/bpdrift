@@ -10,5 +10,8 @@ dist/
 data/breakpoints/
 *.xlsx
 
+# Raw public AST data: large, re-downloadable, pinned by checksum instead
+data/bvbrc/
+
 # macOS
 .DS_Store
