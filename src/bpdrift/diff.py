@@ -36,6 +36,7 @@ DILUTIONS = (
 )
 
 MAPPING_COLUMNS = ["old_group", "old_agent", "new_group", "new_agent"]
+MAPPING_OPTIONAL = ["note"]  # free text: why the rows correspond
 
 
 class DiffError(ValueError):
@@ -141,27 +142,43 @@ def load_mapping(path: str | Path) -> Mapping:
     A line with both agent columns empty renames an organism group, for
     example a sheet EUCAST renamed between versions. Any other line pairs
     one old row with one new row; repeat the old row on several lines to
-    record a split. Group names are as they appear in each table.
+    record a split. Group names are as they appear in each table. An
+    optional fifth column, note, records why the rows correspond and is
+    not used in matching. Lines starting with # are comments.
     """
-    mapping = Mapping()
     with open(path, newline="", encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        if reader.fieldnames is None or [f.strip() for f in reader.fieldnames] != MAPPING_COLUMNS:
-            raise DiffError(f"{path}: header must be {','.join(MAPPING_COLUMNS)}")
-        for line, raw in enumerate(reader, start=2):
-            og, oa, ng, na = (" ".join((raw.get(c) or "").split()) for c in MAPPING_COLUMNS)
-            if not og or not ng:
-                raise DiffError(f"{path} line {line}: old_group and new_group are required")
-            if not oa and not na:
-                if norm(og) in {norm(k) for k in mapping.group_renames}:
-                    raise DiffError(f"{path} line {line}: group {og!r} renamed twice")
-                mapping.group_renames[og] = ng
-            elif oa and na:
-                mapping.pairs.append((og, oa, ng, na, line))
-            else:
-                raise DiffError(
-                    f"{path} line {line}: give both agents, or neither for a group rename"
-                )
+        # keep the file's own line numbers for error messages
+        numbered = [
+            (n, text) for n, text in enumerate(fh, start=1)
+            if text.strip() and not text.lstrip().startswith("#")
+        ]
+    if not numbered:
+        raise DiffError(f"{path}: empty mapping file")
+
+    header = [f.strip() for f in next(csv.reader([numbered[0][1]]))]
+    if header[:4] != MAPPING_COLUMNS or any(f not in MAPPING_OPTIONAL for f in header[4:]):
+        raise DiffError(
+            f"{path}: header must be {','.join(MAPPING_COLUMNS)}, "
+            f"optionally followed by {','.join(MAPPING_OPTIONAL)}"
+        )
+
+    mapping = Mapping()
+    for line, text in numbered[1:]:
+        cells = next(csv.reader([text]))
+        if len(cells) > len(header):
+            raise DiffError(f"{path} line {line}: {len(cells)} fields, header has {len(header)}")
+        cells += [""] * (len(header) - len(cells))
+        og, oa, ng, na = (" ".join(c.split()) for c in cells[:4])
+        if not og or not ng:
+            raise DiffError(f"{path} line {line}: old_group and new_group are required")
+        if not oa and not na:
+            if norm(og) in {norm(k) for k in mapping.group_renames}:
+                raise DiffError(f"{path} line {line}: group {og!r} renamed twice")
+            mapping.group_renames[og] = ng
+        elif oa and na:
+            mapping.pairs.append((og, oa, ng, na, line))
+        else:
+            raise DiffError(f"{path} line {line}: give both agents, or neither for a group rename")
     return mapping
 
 

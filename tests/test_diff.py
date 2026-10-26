@@ -178,10 +178,37 @@ def test_mapping_errors_name_the_line(tmp_path, line, message):
         diff_tables(table("a", mk("X", 1, 1)), table("b", mk("X", 1, 1)), m)
 
 
+def test_mapping_note_column_and_comments(tmp_path):
+    p = tmp_path / "noted.csv"
+    p.write_text(
+        "# reviewed 2026-10-26\n"
+        "old_group,old_agent,new_group,new_agent,note\n"
+        "\n"
+        "# carbapenems\n"
+        'Testobacterales,X,Testobacterales,"X, subgroup",indication split; see v13 note 2\n'
+        "Testobacterales,Y,Testobacterales,Y2\n",
+        encoding="utf-8",
+    )
+    m = load_mapping(p)
+    assert [(oa, na, line) for _, oa, _, na, line in m.pairs] == [
+        ("X", "X, subgroup", 5), ("Y", "Y2", 6),
+    ]
+
+
+def test_mapping_error_reports_file_line_despite_comments(tmp_path):
+    p = tmp_path / "bad.csv"
+    p.write_text("# c\nold_group,old_agent,new_group,new_agent\n# c\nG,X,G,\n", encoding="utf-8")
+    with pytest.raises(DiffError, match="line 4"):
+        load_mapping(p)
+
+
 @pytest.mark.parametrize(
     "content, message",
     [
         ("a,b,c\n", "header must be"),
+        ("old_group,old_agent,new_group,new_agent,extra\n", "header must be"),
+        ("# only a comment\n", "empty mapping"),
+        ("old_group,old_agent,new_group,new_agent\nG,X,G,Y,too,many\n", "6 fields"),
         ("old_group,old_agent,new_group,new_agent\nG,X,G,\n", "line 2: give both agents"),
         ("old_group,old_agent,new_group,new_agent\n,X,G,Y\n", "line 2: old_group and new_group"),
         ("old_group,old_agent,new_group,new_agent\nG,,H,\ng,,K,\n", "renamed twice"),

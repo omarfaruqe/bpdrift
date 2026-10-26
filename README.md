@@ -47,7 +47,9 @@ P.multocida,,Pasteurella,
 ```
 
 A line with no agents renames a whole organism group. A mapping line
-naming a row that does not exist is an error.
+naming a row that does not exist is an error. An optional fifth column,
+`note`, records why two rows correspond; lines starting with `#` are
+comments.
 
 ## Status
 
