@@ -25,3 +25,17 @@ Enterobacterales, agents relevant to *Klebsiella pneumoniae*.
 | Organism-specific rows with no *Klebsiella* row (oral fosfomycin from v13.1; *Proteus* and *Serratia* rows) | none | drug drops out of the *Klebsiella* analysis for that version |
 
 These files hold agent names only, no breakpoint values.
+
+## BV-BRC antibiotic links
+
+`bvbrc_to_eucast_enterobacterales.csv` links each BV-BRC antibiotic name to
+the EUCAST Enterobacterales row used for *K. pneumoniae* in each version.
+Reviewed by Md Omar Faruqe, 2026-10-26. Beyond the decisions above:
+
+| Decision | Choice |
+|---|---|
+| Aminoglycosides: systemic / urinary-tract rows | systemic |
+| Agents whose only *Klebsiella* breakpoint is urinary-tract specific (cefazolin, cefpodoxime, trimethoprim) | kept, tagged `restriction=urinary`; excluded from the main analysis |
+| Agents with no applicable numeric breakpoint in any version (e.g. tigecycline, nitrofurantoin: *E. coli* only; tetracycline, minocycline: "-"; cefoxitin: screen only; polymyxin B: no row) | not linked |
+| Combination MICs reported as a ratio pair for amoxicillin-clavulanic acid and ampicillin-sulbactam (CLSI 2:1 method; EUCAST uses a fixed inhibitor concentration) | excluded from the main analysis |
+| MICs whose sign field disagrees with the reading | sign field trusted; sensitivity analysis treats them as exact |

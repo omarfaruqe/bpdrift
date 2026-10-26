@@ -1,5 +1,5 @@
 # Links BV-BRC antibiotic names to the EUCAST Enterobacterales row used for
-# Klebsiella pneumoniae in each table version. DRAFT, pending review.
+# Klebsiella pneumoniae in each table version. Reviewed by Md Omar Faruqe, 2026-10-26.
 # Empty eucast_agent: no applicable row in that version (reason in note).
 # restriction=urinary: the only Klebsiella breakpoint is urinary-tract specific.
 bvbrc_antibiotic,eucast_version,eucast_agent,restriction,note
