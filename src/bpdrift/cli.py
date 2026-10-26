@@ -4,6 +4,8 @@
     bpdrift interpret MIC --table FILE --group G --agent A [--pin P]
     bpdrift diff OLD NEW [--map map.csv] [--group G ...] [--changed-only]
                          [--old-pin P] [--new-pin P] [-o diff.csv]
+    bpdrift reinterpret --bvbrc AMR.csv --links LINKS.csv --group G
+                        --table T1.xlsx --table T2.xlsx ... [-o out.csv]
 """
 
 from __future__ import annotations
@@ -13,8 +15,14 @@ import csv
 import sys
 from pathlib import Path
 
+from collections import Counter
+
 from bpdrift import __version__
+from bpdrift.bvbrc import BVBRCFormatError, read_bvbrc_csv
 from bpdrift.diff import ChangeKind, DiffError, diff_tables, load_mapping, norm
+from bpdrift.links import LinkError, load_links
+from bpdrift.reinterpret import COLUMNS as REINTERPRET_COLUMNS
+from bpdrift.reinterpret import as_row, reinterpret
 from bpdrift.eucast import EucastFormatError, read_eucast_xlsx
 from bpdrift.interpret import interpret
 from bpdrift.mic import MICParseError
@@ -102,6 +110,43 @@ def _cmd_diff(args) -> int:
     return 0
 
 
+def _cmd_reinterpret(args) -> int:
+    tables = {}
+    for path in args.table:
+        t = read_eucast_xlsx(path)
+        if t.version in tables:
+            raise CLIError(f"two tables for v{t.version}: {path}")
+        tables[t.version] = t
+    imp = read_bvbrc_csv(args.bvbrc)
+    links = load_links(args.links)
+    rows, unlinked = reinterpret(imp.records, tables, links, args.group)
+
+    out = open(args.output, "w", newline="", encoding="utf-8") if args.output else sys.stdout
+    try:
+        writer = csv.writer(out)
+        writer.writerow(REINTERPRET_COLUMNS)
+        for x in rows:
+            writer.writerow(as_row(x))
+    finally:
+        if out is not sys.stdout:
+            out.close()
+
+    s = imp.summary()
+    err = sys.stderr
+    print(f"read {s['lines']} lines: {s['records']} MIC records, "
+          f"excluded {s['excluded_no_value']} without a value, {s['excluded_not_mic']} not MIC, "
+          f"{s['excluded_duplicate']} duplicates", file=err)
+    linked = s["records"] - sum(unlinked.values())
+    print(f"interpreted {linked} records under {len(tables)} versions "
+          f"({', '.join(sorted(tables))}): {len(rows)} rows; "
+          f"{sum(unlinked.values())} records in {len(unlinked)} unlinked antibiotics", file=err)
+    main = Counter(x.category.value for x in rows if x.in_main)
+    print("main analysis categories: " + ", ".join(f"{k} {v}" for k, v in sorted(main.items())), file=err)
+    if args.output:
+        print(f"wrote {args.output}", file=err)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="bpdrift", description="Version-pinned EUCAST MIC breakpoints.")
     p.add_argument("--version", action="version", version=f"bpdrift {__version__}")
@@ -133,6 +178,14 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--new-pin")
     sp.add_argument("-o", "--output", help="write CSV here instead of stdout")
     sp.set_defaults(func=_cmd_diff)
+
+    sp = sub.add_parser("reinterpret", help="interpret BV-BRC MICs under several tables")
+    sp.add_argument("--bvbrc", required=True, help="BV-BRC genome_amr CSV export")
+    sp.add_argument("--links", required=True, help="antibiotic links CSV")
+    sp.add_argument("--group", required=True, help="sheet or organism subgroup, e.g. Enterobacterales")
+    sp.add_argument("--table", action="append", required=True, help="EUCAST table (repeatable)")
+    sp.add_argument("-o", "--output", help="write CSV here instead of stdout")
+    sp.set_defaults(func=_cmd_reinterpret)
     return p
 
 
@@ -140,7 +193,8 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return args.func(args)
-    except (CLIError, DiffError, EucastFormatError, MICParseError, PinError, OSError) as exc:
+    except (CLIError, DiffError, EucastFormatError, MICParseError, PinError, BVBRCFormatError,
+            LinkError, OSError) as exc:
         print(f"bpdrift: error: {exc}", file=sys.stderr)
         return 1
 

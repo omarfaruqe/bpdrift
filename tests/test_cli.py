@@ -88,3 +88,42 @@ def test_bad_mic_is_an_error_not_a_crash(tables, capsys):
     assert main(["interpret", "eight", "--table", str(new), "--group", "Testobacterales",
                  "--agent", "Betacillin"]) == 1
     assert "cannot parse MIC" in capsys.readouterr().err
+
+
+def test_reinterpret_command(tmp_path, tables, capsys):
+    from test_bvbrc import rec as bv_rec
+    from test_bvbrc import write as bv_write
+
+    old, new = tables
+    amr = bv_write(tmp_path, [
+        bv_rec(genome="573.1", ab="betacillin", meas="2", value="2"),
+        bv_rec(genome="573.2", ab="betacillin", meas="<=0.25", sign="<=", value="0.25"),
+        bv_rec(genome="573.3", ab="polymyxin B", meas="1", value="1"),
+        bv_rec(genome="573.4", ab="betacillin", meas="", value=""),
+    ])
+    links = tmp_path / "links.csv"
+    links.write_text(
+        "bvbrc_antibiotic,eucast_version,eucast_agent,restriction,note\n"
+        "betacillin,13.1,Betacillin,,\nbetacillin,16.1,Betacillin,,\n", encoding="utf-8")
+    out = tmp_path / "re.csv"
+    assert main(["reinterpret", "--bvbrc", str(amr), "--links", str(links), "--group", "Testobacterales",
+                 "--table", str(new), "--table", str(old), "-o", str(out)]) == 0
+    rows = list(csv.DictReader(out.open(encoding="utf-8")))
+    assert [(r["genome_id"], r["eucast_version"], r["category"]) for r in rows] == [
+        ("573.1", "13.1", "I"), ("573.1", "16.1", "I"),
+        ("573.2", "13.1", "S"), ("573.2", "16.1", "S"),
+    ]
+    err = capsys.readouterr().err
+    assert "1 records in 1 unlinked antibiotics" in err and "1 without a value" in err
+
+
+def test_reinterpret_rejects_duplicate_versions(tmp_path, tables, capsys):
+    from test_bvbrc import rec as bv_rec
+    from test_bvbrc import write as bv_write
+
+    _, new = tables
+    links = tmp_path / "links.csv"
+    links.write_text("bvbrc_antibiotic,eucast_version,eucast_agent,restriction,note\n", encoding="utf-8")
+    code = main(["reinterpret", "--bvbrc", str(bv_write(tmp_path, [bv_rec()])), "--links", str(links),
+                 "--group", "Testobacterales", "--table", str(new), "--table", str(new)])
+    assert code == 1 and "two tables for v16.1" in capsys.readouterr().err

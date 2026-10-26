@@ -13,5 +13,8 @@ data/breakpoints/
 # Raw public AST data: large, re-downloadable, pinned by checksum instead
 data/bvbrc/
 
+# Derived tables repeat EUCAST breakpoint values row by row: keep out of git
+data/derived/
+
 # macOS
 .DS_Store
