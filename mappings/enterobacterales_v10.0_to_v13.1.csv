@@ -1,4 +1,4 @@
-# DRAFT, not yet reviewed. EUCAST v10.0 -> v13.1, Enterobacterales, Klebsiella-relevant agents.
+# Reviewed by Md Omar Faruqe, 2026-10-26. EUCAST v10.0 -> v13.1, Enterobacterales, Klebsiella-relevant agents.
 # Rules: renames 1:1; indication/route splits map to every resulting row;
 # organism splits map only to the row covering Klebsiella spp.
 old_group,old_agent,new_group,new_agent,note

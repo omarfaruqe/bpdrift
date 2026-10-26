@@ -1,4 +1,4 @@
-# DRAFT, not yet reviewed. EUCAST v13.1 -> v15.0, Enterobacterales, Klebsiella-relevant agents.
+# Reviewed by Md Omar Faruqe, 2026-10-26. EUCAST v13.1 -> v15.0, Enterobacterales, Klebsiella-relevant agents.
 old_group,old_agent,new_group,new_agent,note
 Enterobacterales,Fosfomycin iv,Enterobacterales,"Fosfomycin iv, other Enterobacterales",organism split: Klebsiella falls under other Enterobacterales
 # Left unmapped on purpose:
