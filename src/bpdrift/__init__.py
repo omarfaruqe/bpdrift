@@ -7,6 +7,7 @@ from bpdrift.interpret import (
     Interpretation,
     interpret,
 )
+from bpdrift.diff import Change, ChangeKind, Diff, DiffError, Flip, diff_tables, load_mapping
 from bpdrift.eucast import BPValue, EucastFormatError, EucastTable, MICRow, read_eucast_xlsx
 from bpdrift.mic import MIC, MICParseError, parse_mic
 from bpdrift.pin import Pin, PinError, load_pin, pin_file, save_pin, verify
@@ -33,5 +34,12 @@ __all__ = [
     "EucastTable",
     "MICRow",
     "read_eucast_xlsx",
+    "Change",
+    "ChangeKind",
+    "Diff",
+    "DiffError",
+    "Flip",
+    "diff_tables",
+    "load_mapping",
     "__version__",
 ]
