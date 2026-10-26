@@ -17,6 +17,7 @@ bpdrift = "bpdrift.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+analysis = ["matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
