@@ -12,6 +12,9 @@ license = "MIT"
 authors = [{ name = "Md Omar Faruqe" }]
 dependencies = ["openpyxl>=3.1"]
 
+[project.scripts]
+bpdrift = "bpdrift.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
