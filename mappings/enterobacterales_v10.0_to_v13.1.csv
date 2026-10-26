@@ -1,0 +1,25 @@
+# DRAFT, not yet reviewed. EUCAST v10.0 -> v13.1, Enterobacterales, Klebsiella-relevant agents.
+# Rules: renames 1:1; indication/route splits map to every resulting row;
+# organism splits map only to the row covering Klebsiella spp.
+old_group,old_agent,new_group,new_agent,note
+Enterobacterales,Amoxicillin-clavulanic acid,Enterobacterales,Amoxicillin-clavulanic acid iv,route split
+Enterobacterales,Amoxicillin-clavulanic acid,Enterobacterales,Amoxicillin-clavulanic acid oral (infections originating from the urinary tract),route split
+Enterobacterales,Amoxicillin-clavulanic acid,Enterobacterales,Amoxicillin-clavulanic acid oral (other indications),route split
+Enterobacterales,Amoxicillin-clavulanic acid (uncomplicated UTI only),Enterobacterales,Amoxicillin-clavulanic acid oral (uncomplicated UTI only),rename: route made explicit
+Enterobacterales,Ampicillin,Enterobacterales,Ampicillin iv,route split
+Enterobacterales,Ampicillin,Enterobacterales,Ampicillin oral (uncomplicated UTI only),route split
+Enterobacterales,"Cefazolin (infections originating from the urinary tract), E. coli, and Klebsiella spp. (except K. aerogenes)",Enterobacterales,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",rename: punctuation only
+Enterobacterales,Cefotaxime,Enterobacterales,Cefotaxime (indications other than meningitis),indication split
+Enterobacterales,Cefotaxime,Enterobacterales,Cefotaxime (meningitis),indication split
+Enterobacterales,Ceftriaxone,Enterobacterales,Ceftriaxone (indications other than meningitis),indication split
+Enterobacterales,Ceftriaxone,Enterobacterales,Ceftriaxone (meningitis),indication split
+Enterobacterales,Ciprofloxacin,Enterobacterales,Ciprofloxacin (indications other than meningitis),indication split
+Enterobacterales,Ciprofloxacin,Enterobacterales,Ciprofloxacin (meningitis),indication split
+Enterobacterales,Imipenem,Enterobacterales,"Imipenem, Enterobacterales except Morganellaceae",organism split: Klebsiella is outside Morganellaceae
+Enterobacterales,"Imipenem, Morganella morganii, Proteus spp. and Providencia spp.",Enterobacterales,"Imipenem, Morganellaceae",rename: family name replaces genus list
+Enterobacterales,"Imipenem-relebactam, Enterobacterales except Morganella spp.",Enterobacterales,"Imipenem-relebactam, Enterobacterales except Morganellaceae",rename: family name replaces genus
+Enterobacterales,Meropenem,Enterobacterales,Meropenem (indications other than meningitis),indication split
+Enterobacterales,Meropenem,Enterobacterales,Meropenem (meningitis),indication split
+Enterobacterales,Temocillin,Enterobacterales,"Temocillin (infections originating from the urinary tract), E. coli, Klebsiella spp. (except K. aerogenes) and P. mirabilis",note replaced by breakpoint for named species incl. Klebsiella
+# Left unmapped on purpose:
+#   Fosfomycin oral (uncomplicated UTI only) -> new row covers E. coli only, so no Klebsiella breakpoint in v13.1

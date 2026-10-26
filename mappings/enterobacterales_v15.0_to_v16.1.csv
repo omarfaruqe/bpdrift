@@ -1,0 +1,7 @@
+# DRAFT, not yet reviewed. EUCAST v15.0 -> v16.1, Enterobacterales, Klebsiella-relevant agents.
+old_group,old_agent,new_group,new_agent,note
+Enterobacterales,Trimethoprim (uncomplicated UTI only),Enterobacterales,"Trimethoprim (uncomplicated UTI only), E. coli and Klebsiella spp. (except K. aerogenes)",organism split: row naming Klebsiella
+Enterobacterales,Trimethoprim-sulfamethoxazole,Enterobacterales,"Trimethoprim-sulfamethoxazole, Enterobacterales except Serratia spp.",organism split: Klebsiella is not Serratia
+# Left unmapped on purpose:
+#   Trimethoprim (uncomplicated UTI only) -> "..., Proteus spp." does not cover Klebsiella
+#   Trimethoprim-sulfamethoxazole -> "..., Serratia spp." does not cover Klebsiella
