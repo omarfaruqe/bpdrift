@@ -9,3 +9,6 @@ dist/
 # Breakpoint tables are copyrighted: never commit them
 data/breakpoints/
 *.xlsx
+
+# macOS
+.DS_Store
