@@ -9,6 +9,11 @@ Layout, as found in v16.1 (2026), one worksheet per organism group:
     row n+1               | "S ≤" | "R >" | "ATU"
     rows     <agent>      |  S    |  R    |  ATU     (until column A is blank)
 
+Some sheets (the anaerobes) hold one block per organism subgroup, each
+under its own large bold heading ("Bacteroides spp.", "Prevotella spp."),
+and repeat the same agents in every block. The heading is kept as the
+row's subgroup, so those rows stay distinct.
+
 Footnote markers are superscript runs inside the cell's rich text, so
 "8" + superscript "2" is the value 8 with note 2, never 82. Reading the
 plain cell value would silently corrupt such breakpoints; this module
@@ -74,10 +79,16 @@ class MICRow:
     r: BPValue
     atu: str                   # area of technical uncertainty, as written
     row: int                   # 1-based worksheet row
+    subgroup: str = ""         # organism subgroup heading, "" when the sheet has none
 
     @property
     def cell(self) -> str:
         return f"{self.sheet}!A{self.row}"
+
+    @property
+    def group(self) -> str:
+        """The organism group the breakpoint applies to."""
+        return self.subgroup or self.sheet
 
     def breakpoint(self) -> Breakpoint:
         """The pair for interpret(); incomplete unless both cells hold values."""
@@ -168,12 +179,33 @@ def _detect_version(workbook) -> str:
     return found.most_common(1)[0][0]
 
 
+SUBGROUP_MIN_SIZE = 12  # subgroup headings are 14 pt bold; notes are 8 pt
+
+
+def _subgroup(ws, hdr_row: int, floor: int) -> str:
+    """Nearest large bold heading in column A between floor and hdr_row.
+
+    Row 1 is the sheet title and is never a subgroup.
+    """
+    for r in range(hdr_row - 1, max(floor, 1), -1):
+        cell = ws.cell(r, 1)
+        text = " ".join(_split(cell.value)[0].split())
+        if not text or text.startswith("http"):
+            continue
+        font = cell.font
+        if font is not None and font.b and (font.sz or 0) >= SUBGROUP_MIN_SIZE:
+            return text
+    return ""
+
+
 def _read_sheet(ws) -> list[MICRow]:
     rows: list[MICRow] = []
+    floor = 1  # last row of the previous block
     for header in ws["B"]:
         if not _split(header.value)[0].startswith(MIC_HEADER):
             continue
         hdr_row = header.row
+        subgroup = _subgroup(ws, hdr_row, floor)
         s_label = _split(ws.cell(hdr_row + 1, 2).value)[0].strip()
         r_label = _split(ws.cell(hdr_row + 1, 3).value)[0].strip()
         if not s_label.endswith("≤") or r_label != "R >":
@@ -201,9 +233,11 @@ def _read_sheet(ws) -> list[MICRow]:
                     r=_parse_value(ws.cell(r, 3).value, f"{ws.title}!C{r}"),
                     atu=_split(ws.cell(r, 4).value)[0].strip(),
                     row=r,
+                    subgroup=subgroup,
                 )
             )
             r += 1
+        floor = r
     return rows
 
 

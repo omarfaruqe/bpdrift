@@ -55,6 +55,15 @@ def test_every_row_is_well_formed(table):
             assert bp.is_complete, r.cell
 
 
+def test_each_agent_appears_once_per_organism_group(table):
+    _, t = table
+    seen = {}
+    for r in t.rows:
+        key = (r.sheet, r.group, " ".join(r.agent.split()).casefold())
+        assert key not in seen, f"{r.cell} repeats {seen.get(key)}"
+        seen[key] = r.cell
+
+
 def test_a_good_share_have_numeric_breakpoints(table):
     _, t = table
     complete = [r for r in t.rows if r.breakpoint().is_complete]

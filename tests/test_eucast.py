@@ -8,6 +8,7 @@ import pytest
 openpyxl = pytest.importorskip("openpyxl")
 from openpyxl.cell.rich_text import CellRichText, TextBlock  # noqa: E402
 from openpyxl.cell.text import InlineFont  # noqa: E402
+from openpyxl.styles import Font  # noqa: E402
 
 from bpdrift.eucast import EucastFormatError, read_eucast_xlsx  # noqa: E402
 from bpdrift.interpret import Category, interpret  # noqa: E402
@@ -59,6 +60,14 @@ def build(path, version="16.1", extra_value=None, header_r="R >"):
     ])
     ws.cell(block2 - 2, 3, header_r)  # the R header of the second block
 
+    an = wb.create_sheet("Anaerobes")
+    an.cell(1, 1, "Anaerobes").font = Font(b=True, sz=14)  # sheet title, never a subgroup
+    an.cell(4, 1, "Alphoides spp.").font = Font(b=True, sz=14)
+    an.cell(6, 1, "Breakpoints for Alphoides also apply to X.").font = Font(b=True, sz=8)
+    end = mic_block(an, 8, "Antimicrobial agent", [("Alphacillin", "2", "2", None)])
+    an.cell(end + 2, 1, "Betoides spp.").font = Font(b=True, sz=14)
+    mic_block(an, end + 4, "Antimicrobial agent", [("Alphacillin", "0.5", "0.5", None)])
+
     pk = wb.create_sheet("PK PD breakpoints")
     pk.cell(1, 4, "EUCAST Clinical Breakpoint Tables v. 14.0")
     mic_block(pk, 6, "Penicillins", [("Alphacillin", "2", "8", None)])
@@ -71,15 +80,30 @@ def table(tmp_path):
     return read_eucast_xlsx(build(tmp_path / "synthetic.xlsx"))
 
 
-def row(table, agent):
-    (match,) = [r for r in table.rows if r.agent == agent]
+def row(table, agent, sheet="Testobacterales"):
+    (match,) = [r for r in table.for_sheet(sheet) if r.agent == agent]
     return match
 
 
 def test_version_and_sheets(table):
     assert table.version == "16.1"
-    assert table.sheets == ["Testobacterales"]  # PK-PD excluded by default
-    assert len(table.rows) == 11
+    assert table.sheets == ["Testobacterales", "Anaerobes"]  # PK-PD excluded by default
+    assert len(table.for_sheet("Testobacterales")) == 11
+
+
+def test_subgroups_keep_repeated_agents_apart(table):
+    rows = table.for_sheet("Anaerobes")
+    assert [(r.subgroup, r.s.value) for r in rows] == [
+        ("Alphoides spp.", 2.0),
+        ("Betoides spp.", 0.5),
+    ]
+    assert [r.group for r in rows] == ["Alphoides spp.", "Betoides spp."]
+
+
+def test_sheets_without_subgroups(table):
+    for r in table.for_sheet("Testobacterales"):
+        assert r.subgroup == ""
+        assert r.group == "Testobacterales"
 
 
 def test_superscript_notes_are_split_not_glued(table):
