@@ -1,0 +1,25 @@
+genomes with main-analysis labels: 4965
+genome-drug-version labels dropped for disagreeing records: 0
+genomes lost, BioSample not in NCBI Pathogen Detection: 270
+genomes lost, no BioSample in BV-BRC: 54
+genomes with genotype predictions: 4641
+Pathogen Detection BioSamples dropped for differing entries: 93
+antibiotics predicted: 28
+excluded families: acrR, emrD, kdeA, marR, ompK35, ompK36, ompK37, oqxA, oqxB, oqxR, ramR
+excluded symbols: fosA, fosA10, fosA5, fosA9
+element calls ignored (by method or excluded family):
+    fosA: 4642
+    emrD: 4631
+    oqxA: 4503
+    oqxB: 4496
+    ompK35: 2241
+    ompK36: 1184
+    MISTRANSLATION: 1148
+    PARTIAL: 970
+    ramR: 729
+    HMM: 104
+    oqxR: 93
+    acrR: 70
+element symbols not in the AMRFinderPlus catalogue: 2 (2 distinct)
+    ramR_Y59_M133del: 1
+    ramR_V97Rfs: 1

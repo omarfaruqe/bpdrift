@@ -69,3 +69,13 @@ def test_end_to_end(tmp_path):
     assert "genomes lost, no BioSample in BV-BRC: 1" in text
     assert "genomes with genotype predictions: 3" in text
     assert "weird: 1" in text
+
+    # matched: g4 (undecidable under 10.0) leaves both versions, so they compare the same pairs
+    out_m, summary_m = tmp_path / "out_m.csv", tmp_path / "summary_m.txt"
+    assert genotype_errors.main([str(re), "--genomes", str(genomes), "--pd-metadata", str(pd),
+                                 "--genes", str(genes), "--map", str(smap), "--matched",
+                                 "-o", str(out_m), "--summary", str(summary_m)]) == 0
+    m = {(r["antibiotic"], r["eucast_version"]): r for r in csv.DictReader(out_m.open(encoding="utf-8"))}
+    assert m[("meropenem", "10.0")]["compared"] == m[("meropenem", "16.1")]["compared"] == "2"
+    assert (m[("meropenem", "10.0")]["vme"], m[("meropenem", "16.1")]["vme"]) == ("0", "1")
+    assert "lacking an S/I/R label under some version: 1" in summary_m.read_text()

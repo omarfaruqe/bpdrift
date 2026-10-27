@@ -2,9 +2,12 @@
 
     python analysis/figures.py results/ -o results/figures
 
-Figure 1  label flip rate between EUCAST v10.0 and v16.1, per antibiotic,
-          with Wilson 95% intervals; main analysis and the sign-exact
-          sensitivity analysis.
+Figure 1  heatmap: share of records changing category at each EUCAST
+          revision and overall, per antibiotic (from robustness.csv;
+          drawn when it exists).
+Figure S1 label flip rate between the first and last EUCAST version, per
+          antibiotic, with Wilson 95% intervals; main analysis and the
+          sign-exact sensitivity analysis.
 Figure 2  agreement of BV-BRC's reported calls with the re-interpreted
           labels (resistant vs not resistant) under each EUCAST version,
           by the testing standard the record states.
@@ -94,7 +97,7 @@ def figure_1(flips, out: Path, a=None, b=None):
              "bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
     fig.tight_layout(rect=(0, 0.02, 1, 0.96))
     for ext in ("png", "svg"):
-        fig.savefig(out / f"figure1_flip_rates.{ext}", dpi=300)
+        fig.savefig(out / f"figureS1_flip_rates.{ext}", dpi=300)
     plt.close(fig)
 
 
@@ -194,12 +197,72 @@ def figure_3(errors, out: Path, min_compared=200, min_shift=2.0):
     fig.text(0.01, 0.995, "The same genotype predictor scores differently under each breakpoint version",
              fontsize=10, fontweight="bold", va="top")
     fig.text(0.01, 0.005, "AMRFinderPlus calls (NCBI Pathogen Detection) vs re-interpreted MICs; K. pneumoniae, "
-             "main analysis.\nVery major = missed resistance; major = false resistance; bars are Wilson 95% "
+             "identical genome-drug pairs under every version.\nVery major = missed resistance; major = false resistance; bars are Wilson 95% "
              "intervals.\nAntibiotics whose error rate moves by at least 2 percentage points; y-axis scales "
              "differ by panel.", fontsize=6.5, color=INK_2)
     fig.tight_layout(rect=(0, 0.07, 1, 0.92))
     for ext in ("png", "svg"):
         fig.savefig(out / f"figure3_genotype_errors.{ext}", dpi=300)
+    plt.close(fig)
+
+
+# single-hue sequential ramp (light -> dark), from the validated palette
+RAMP = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5",
+        "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281", "#0d366b"]
+ZERO = "#f0efec"
+
+
+def figure_heatmap(rob, out: Path, scenario="record"):
+    from matplotlib.colors import LinearSegmentedColormap
+
+    rows = [r for r in rob if r["scenario"] == scenario and r["boot_lo"] != ""]
+    versions = sorted({r["version_a"] for r in rows} | {r["version_b"] for r in rows}, key=_vkey)
+    steps = list(zip(versions, versions[1:]))
+    cols = steps + [(versions[0], versions[-1])]
+    cell = {(r["antibiotic"], r["version_a"], r["version_b"]): r for r in rows}
+    drugs = sorted({r["antibiotic"] for r in rows if r["antibiotic"] != "ALL" and int(r["flips"]) > 0},
+                   key=lambda ab: -float(cell[(ab, versions[0], versions[-1])]["flip_rate"]))
+    n_all = len({r["antibiotic"] for r in rows if r["antibiotic"] != "ALL"})
+    names = [f"All {n_all} antibiotics"] + [_pretty(d) for d in drugs]
+    keys = ["ALL"] + drugs
+    vmax = max(float(cell[(k, a, b)]["flip_rate"]) for k in keys for a, b in cols if (k, a, b) in cell)
+    cmap = LinearSegmentedColormap.from_list("blue", RAMP)
+
+    fig, ax = plt.subplots(figsize=(7.0, 0.32 * len(keys) + 1.6))
+    for i, k in enumerate(keys):
+        y = i + (0 if i == 0 else 0.35)                     # gap under the ALL row
+        for j, (a, b) in enumerate(cols):
+            x = j + (0.35 if j == len(cols) - 1 else 0)    # gap before the overall column
+            r = cell.get((k, a, b))
+            if r is None:
+                face, label, ink = "white", "", INK_2
+            else:
+                v, flips = float(r["flip_rate"]), int(r["flips"])
+                face = ZERO if flips == 0 else cmap(min(1.0, 0.08 + 0.92 * v / vmax))
+                dark = flips > 0 and v / vmax > 0.45
+                ink = "white" if dark else (INK_2 if flips == 0 else INK)
+                label = "0" if flips == 0 else (f"{100 * v:.1f}" if v >= 0.001 else "<0.1")
+            ax.add_patch(plt.Rectangle((x + 0.03, y + 0.04), 0.94, 0.92, facecolor=face, edgecolor="none"))
+            ax.text(x + 0.5, y + 0.5, label, ha="center", va="center", fontsize=7.5, color=ink)
+    ax.set_xlim(0, len(cols) + 0.35)
+    ax.set_ylim(len(keys) + 0.35, 0)
+    ax.set_xticks([j + 0.5 + (0.35 if j == len(cols) - 1 else 0) for j in range(len(cols))],
+                  [f"v{a}\n\u2192 v{b}" for a, b in steps] + [f"Overall\nv{versions[0]} \u2192 v{versions[-1]}"],
+                  fontsize=7.5)
+    ax.xaxis.tick_top()
+    ax.set_yticks([i + 0.5 + (0 if i == 0 else 0.35) for i in range(len(keys))], names)
+    ax.tick_params(length=0)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    fig.text(0.01, 0.985, "Share of records whose S/I/R category changes, by EUCAST revision",
+             fontsize=10, fontweight="bold", va="top")
+    fig.text(0.01, 0.01, f"K. pneumoniae MICs from BV-BRC, main analysis; % of records decidable under both "
+             f"versions. Darker = larger share; 0 = no change.\nRows: antibiotics with any change; "
+             f"the other {n_all - len(drugs)} antibiotics never changed. v11.0 and v12.0 were not available.",
+             fontsize=6.5, color=INK_2)
+    fig.tight_layout(rect=(0, 0.06, 1, 0.94))
+    for ext in ("png", "svg"):
+        fig.savefig(out / f"figure1_change_heatmap.{ext}", dpi=300)
     plt.close(fig)
 
 
@@ -212,6 +275,9 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     figure_1(_read(Path(args.results) / "flip_rates.csv"), out)
     figure_2(_read(Path(args.results) / "as_reported.csv"), out)
+    rob = Path(args.results) / "robustness.csv"
+    if rob.exists():
+        figure_heatmap(_read(rob), out)
     genotype = Path(args.results) / "genotype_errors.csv"
     if genotype.exists():
         figure_3(_read(genotype), out)

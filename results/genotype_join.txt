@@ -1,5 +1,6 @@
 genomes with main-analysis labels: 4965
 genome-drug-version labels dropped for disagreeing records: 0
+matched: genome-drug pairs dropped for lacking an S/I/R label under some version: 3862
 genomes lost, BioSample not in NCBI Pathogen Detection: 270
 genomes lost, no BioSample in BV-BRC: 54
 genomes with genotype predictions: 4641

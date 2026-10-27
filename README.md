@@ -101,12 +101,18 @@ bpdrift reinterpret --bvbrc data/bvbrc/kpneumoniae_amr_all.csv \
     -o data/derived/kpneumoniae_reinterpreted.csv
 python analysis/flip_rates.py data/derived/kpneumoniae_reinterpreted.csv -o results/flip_rates.csv
 python analysis/as_reported.py data/derived/kpneumoniae_reinterpreted.csv -o results/as_reported.csv
-python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv \
-    --genomes data/bvbrc/kpneumoniae_genomes.csv --pd-metadata data/ncbi/PDG*.metadata.tsv \
-    --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv \
-    --map mappings/amrfinder_subclass_to_antibiotic.csv \
-    --exclude mappings/amrfinder_excluded_families.csv \
+python analysis/robustness.py data/derived/kpneumoniae_reinterpreted.csv \
+    -o results/robustness.csv --transitions results/transitions.csv
+G="--genomes data/bvbrc/kpneumoniae_genomes.csv --pd-metadata data/ncbi/PDG*.metadata.tsv \
+   --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv \
+   --map mappings/amrfinder_subclass_to_antibiotic.csv \
+   --exclude mappings/amrfinder_excluded_families.csv"
+# primary: identical genome-drug pairs under every version
+python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G --matched \
     -o results/genotype_errors.csv --summary results/genotype_join.txt
+# sensitivity: every pair labelled under each version
+python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G \
+    -o results/genotype_errors_unmatched.csv --summary results/genotype_join_unmatched.txt
 python analysis/figures.py results -o results/figures
 ```
 

@@ -6,7 +6,7 @@
         --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv \
         --map mappings/amrfinder_subclass_to_antibiotic.csv \
         --exclude mappings/amrfinder_excluded_families.csv \
-        -o results/genotype_errors.csv --summary results/genotype_join.txt
+        --matched -o results/genotype_errors.csv --summary results/genotype_join.txt
 
 Labels: main-analysis records only, one label per (genome, antibiotic, version)
 when that genome's records agree. Genotypes: NCBI Pathogen Detection's
@@ -14,6 +14,10 @@ AMRFinderPlus calls (AMR_genotypes), joined to BV-BRC genomes by BioSample.
 An isolate with an empty AMR_genotypes field is treated as not analysed and
 left out: every K. pneumoniae genome carries at least its chromosomal
 beta-lactamase and fosA, so an empty field means no calls were made.
+
+With --matched, only genome-drug pairs labelled S, I or R under every version
+are compared, so every version is scored on identical pairs and differences
+between versions come from the labels alone.
 
 Output: one row per (antibiotic or ALL, EUCAST version): genome-drug pairs
 compared, then very major and
@@ -92,12 +96,25 @@ def main(argv=None) -> int:
     p.add_argument("--exclude", help="CSV of gene families or symbols the predictor ignores")
     p.add_argument("-o", "--output", required=True)
     p.add_argument("--summary", required=True)
+    p.add_argument("--matched", action="store_true",
+                   help="compare only genome-drug pairs labelled S, I or R under every version")
     a = p.parse_args(argv)
 
     with open(a.reinterpreted, newline="", encoding="utf-8") as fh:
         rows = [(r["genome_id"], r["antibiotic"], r["eucast_version"], r["category"])
                 for r in csv.DictReader(fh) if r["exclusion"] == ""]
     labels, label_conflicts = collapse_labels(rows)
+    all_versions = {v for _, _, v in labels}
+    unmatched = 0
+    if a.matched:
+        decided = defaultdict(set)
+        for (g, ab, v), cat in labels.items():
+            if cat in ("S", "I", "R"):
+                decided[(g, ab)].add(v)
+        keep = {k for k, vs in decided.items() if vs == all_versions}
+        before = len({(g, ab) for g, ab, _ in labels})
+        labels = {k: c for k, c in labels.items() if (k[0], k[1]) in keep}
+        unmatched = before - len(keep)
     genomes = {g for g, _, _ in labels}
 
     biosample = read_biosamples(a.genomes)
@@ -157,6 +174,8 @@ def main(argv=None) -> int:
     with open(a.summary, "w", encoding="utf-8") as fh:
         fh.write(f"genomes with main-analysis labels: {len(genomes)}\n")
         fh.write(f"genome-drug-version labels dropped for disagreeing records: {label_conflicts}\n")
+        if a.matched:
+            fh.write(f"matched: genome-drug pairs dropped for lacking an S/I/R label under some version: {unmatched}\n")
         for reason, n in lost.most_common():
             fh.write(f"genomes lost, {reason}: {n}\n")
         fh.write(f"genomes with genotype predictions: {len(predictions)}\n")
