@@ -9,6 +9,8 @@ Scenarios (see mappings/README.md for the decisions behind them):
     sign_exact    main-analysis records, sign-conflict MICs taken as exact
     all_records   every linked record, including urinary-only breakpoints,
                   ratio-method combination MICs and conflicting repeats
+    eucast_stated main-analysis records whose source states EUCAST testing only
+    clsi_stated   main-analysis records whose source states CLSI testing only
 
 One output row per (scenario, antibiotic or ALL, version pair). Counts and
 rates only: no breakpoint values are written.
@@ -26,7 +28,7 @@ from bpdrift.interpret import Breakpoint, Category, interpret
 from bpdrift.mic import MIC, parse_mic
 from bpdrift.stats import compare
 
-SCENARIOS = ("main", "sign_exact", "all_records")
+SCENARIOS = ("main", "sign_exact", "all_records", "eucast_stated", "clsi_stated")
 
 COLUMNS = [
     "scenario", "antibiotic", "version_a", "version_b", "records", "both_decidable",
@@ -70,6 +72,11 @@ def load(path: str | Path) -> dict[str, dict[str, dict[str, dict[str, Category]]
             if main:
                 out["main"][ab][key][v] = Category(row["category"])
                 out["sign_exact"][ab][key][v] = _label(row, exact=row["sign_conflict"] == "1")
+                std = row["reported_standard"].upper()
+                if std == "EUCAST":
+                    out["eucast_stated"][ab][key][v] = Category(row["category"])
+                elif std == "CLSI":
+                    out["clsi_stated"][ab][key][v] = Category(row["category"])
     return out
 
 

@@ -12,17 +12,19 @@ flip_rates = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(flip_rates)
 
 
-def row(line, ab, mic, version, s, r, category, exclusion="", sign_conflict=0):
+def row(line, ab, mic, version, s, r, category, exclusion="", sign_conflict=0, std="CLSI"):
     d = dict.fromkeys(RE_COLUMNS, "")
     d.update(source_line=line, antibiotic=ab, mic=mic, eucast_version=version, eucast_S=s, eucast_R=r,
-             category=category, exclusion=exclusion, sign_conflict=sign_conflict, ratio_format=0)
+             category=category, exclusion=exclusion, sign_conflict=sign_conflict, ratio_format=0,
+             reported_standard=std)
     return d
 
 
 def test_scenarios(tmp_path):
     rows = [
         # record 1: 16 mg/L, I under 8/16, R under 8/8 -> one flip in every scenario
-        row(1, "alpha", "16", "10.0", "8", "16", "I"), row(1, "alpha", "16", "16.1", "8", "8", "R"),
+        row(1, "alpha", "16", "10.0", "8", "16", "I", std="EUCAST"),
+        row(1, "alpha", "16", "16.1", "8", "8", "R", std="EUCAST"),
         # record 2: sign conflict ">8": UNDECIDABLE under 8/16, R under 8/8; exact 8 -> S, S
         row(2, "alpha", ">8", "10.0", "8", "16", "UNDECIDABLE", sign_conflict=1),
         row(2, "alpha", ">8", "16.1", "8", "8", "R", sign_conflict=1),
@@ -48,3 +50,8 @@ def test_scenarios(tmp_path):
 
     everything = res[("all_records", "ALL")]
     assert (everything["records"], everything["flips"], everything["r_line_flips"]) == ("3", "2", "2")
+
+    eu = res[("eucast_stated", "alpha")]
+    assert (eu["records"], eu["flips"]) == ("1", "1")
+    cl = res[("clsi_stated", "alpha")]
+    assert (cl["records"], cl["both_decidable"], cl["flips"]) == ("1", "0", "0")
