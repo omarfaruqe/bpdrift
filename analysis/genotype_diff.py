@@ -26,11 +26,19 @@ each a difference (b - a):
 
 Intervals: 95% percentile intervals from a bootstrap that resamples genomes
 (2,000 replicates, fixed seed). ALL is the primary, pooled analysis.
-Drug-level results are exploratory. The testing family is the antibiotics with at
-least one pair whose label changes between the two versions (for the others every
-difference is zero by construction); for them the output also gives Holm-adjusted
-McNemar p-values and Bonferroni-adjusted intervals over the family's estimands
-(3 per antibiotic), computed as estimate +/- z * bootstrap standard error.
+Drug-level results are exploratory. Two multiplicity families are used, both over
+the same set of antibiotics:
+
+    Holm        one McNemar test per antibiotic (overall error rate): k tests
+    Bonferroni  three interval estimates per antibiotic (VME, ME, overall): 3k
+                intervals, each at level 1 - 0.05 / 3k, computed as
+                estimate +/- z * bootstrap standard error
+
+The set of antibiotics is, by default, those with at least one pair whose label
+changes between the two versions (for the others every difference is zero by
+construction). That set is chosen after seeing the labels, so it is an exploratory
+choice; --family all uses every antibiotic compared instead (pre-specified, more
+conservative).
 
 Counts and rates only.
 """
@@ -99,6 +107,10 @@ def main(argv=None) -> int:
                    help="how phenotype I enters the binary outcome: not_r (default; grouped with S), "
                         "r (grouped with R, i.e. non-susceptible), or drop (pairs labelled I under "
                         "either version are left out)")
+    p.add_argument("--family", choices=("changed", "all"), default="changed",
+                   help="drug-level testing family: antibiotics whose labels change between the two "
+                        "versions (default; chosen after seeing the labels, so exploratory) or every "
+                        "antibiotic compared (pre-specified, more conservative)")
     p.add_argument("--replicates", type=int, default=REPLICATES)
     a = p.parse_args(argv)
 
@@ -160,7 +172,7 @@ def main(argv=None) -> int:
 
     # testing family: antibiotics with at least one pair whose label changes; for the
     # others every difference is zero by construction and nothing is tested
-    drugs = [ab for ab in names if ab != "ALL" and ab in changed]
+    drugs = [ab for ab in names if ab != "ALL" and (a.family == "all" or ab in changed)]
     n_tests = 3 * len(drugs)
     alpha_adj = 0.05 / n_tests if n_tests else 0.05
     z_adj = NormalDist().inv_cdf(1 - alpha_adj / 2)
@@ -198,7 +210,8 @@ def main(argv=None) -> int:
         wr.writerows(rows)
     print(f"wrote {a.output}: v{va} vs v{vb}, {len(pairs)} pairs"
           + f"; I as {a.i_as}" + (f" ({dropped_i} pairs with I left out)" if a.i_as == "drop" else "")
-          + f"; testing family {len(drugs)} antibiotics with a label change, {n_tests} estimands "
+          + f"; testing family ({a.family}): {len(drugs)} antibiotics, Holm over {len(drugs)} McNemar tests, "
+          f"Bonferroni over {n_tests} interval estimates "
           f"(Bonferroni intervals at {100 * (1 - alpha_adj):.2f}%); {a.replicates} genome resamples, seed {SEED}")
     return 0
 

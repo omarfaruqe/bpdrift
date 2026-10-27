@@ -38,7 +38,9 @@ plt.rcParams.update({
     "font.family": "DejaVu Sans", "font.size": 8.5, "axes.edgecolor": INK_2,
     "axes.labelcolor": INK, "xtick.color": INK_2, "ytick.color": INK, "text.color": INK,
     "axes.spines.top": False, "axes.spines.right": False, "svg.fonttype": "none",
+    "svg.hashsalt": "bpdrift",  # deterministic element ids, so reruns give identical SVGs
 })
+METADATA = {"svg": {"Date": None}, "png": {}}  # no timestamps in the files
 
 
 def _read(path):
@@ -97,7 +99,7 @@ def figure_1(flips, out: Path, a=None, b=None):
              "bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
     fig.tight_layout(rect=(0, 0.02, 1, 0.96))
     for ext in ("png", "svg"):
-        fig.savefig(out / f"figureS1_flip_rates.{ext}", dpi=300)
+        fig.savefig(out / f"figureS1_flip_rates.{ext}", dpi=300, metadata=METADATA[ext])
     plt.close(fig)
 
 
@@ -143,7 +145,7 @@ def figure_2(agree, out: Path):
              f"n = records compared under v{versions[-1]}; bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
     fig.tight_layout(rect=(0, 0.06, 1, 0.94))
     for ext in ("png", "svg"):
-        fig.savefig(out / f"figure2_reported_agreement.{ext}", dpi=300)
+        fig.savefig(out / f"figure2_reported_agreement.{ext}", dpi=300, metadata=METADATA[ext])
     plt.close(fig)
 
 
@@ -202,7 +204,7 @@ def figure_3(errors, out: Path, min_compared=200, min_shift=2.0):
              "differ by panel.", fontsize=6.5, color=INK_2)
     fig.tight_layout(rect=(0, 0.07, 1, 0.92))
     for ext in ("png", "svg"):
-        fig.savefig(out / f"figure3_genotype_errors.{ext}", dpi=300)
+        fig.savefig(out / f"figure3_genotype_errors.{ext}", dpi=300, metadata=METADATA[ext])
     plt.close(fig)
 
 
@@ -262,7 +264,7 @@ def figure_heatmap(rob, out: Path, scenario="record"):
              fontsize=6.5, color=INK_2)
     fig.tight_layout(rect=(0, 0.06, 1, 0.94))
     for ext in ("png", "svg"):
-        fig.savefig(out / f"figure1_change_heatmap.{ext}", dpi=300)
+        fig.savefig(out / f"figure1_change_heatmap.{ext}", dpi=300, metadata=METADATA[ext])
     plt.close(fig)
 
 

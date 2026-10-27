@@ -96,3 +96,12 @@ def test_i_as_r(tmp_path):
     assert (r["vme_num_a"], r["vme_den_a"], r["vme_num_b"], r["vme_den_b"]) == ("1", "3", "2", "4")
     assert (r["me_num_a"], r["me_den_a"]) == ("0", "1")
     assert (r["error_to_correct"], r["correct_to_error"]) == ("0", "1")   # only g4 (S -> R) changes
+
+
+def test_family_all_includes_unchanged_antibiotics(tmp_path):
+    res = run(tmp_path, "--family", "all")
+    assert res["beta"]["mcnemar_p_holm"] != ""          # tested, although its labels never change
+    assert float(res["beta"]["mcnemar_p_holm"]) == 1.0
+    # two antibiotics in the family now: Holm doubles alpha's single p-value (capped at 1)
+    single = run(tmp_path)["alpha"]
+    assert float(res["alpha"]["mcnemar_p_holm"]) == min(1.0, 2 * float(single["mcnemar_p"]))

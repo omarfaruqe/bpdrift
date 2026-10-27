@@ -2,8 +2,8 @@
 
     python analysis/inputs_manifest.py data -o results/table_s1_inputs.csv
 
-Lists the EUCAST tables (version read from each workbook), the BV-BRC exports
-and the NCBI files under data/, with size and SHA-256, so a reader can check
+Lists the EUCAST tables (version read from each workbook), the BV-BRC exports,
+the NCBI files and the NCBI BioSample antibiogram batches under data/, with size and SHA-256, so a reader can check
 that a re-run uses byte-identical inputs. File contents are not copied.
 """
 
@@ -21,6 +21,7 @@ SOURCES = {
     "breakpoints": "EUCAST clinical breakpoint table",
     "bvbrc": "BV-BRC export",
     "ncbi": "NCBI Pathogen Detection / AMRFinderPlus",
+    "ncbi/ast": "NCBI BioSample antibiograms (E-utilities)",
 }
 
 

@@ -2,7 +2,7 @@
 
     python analysis/ncbi_ast.py data/ncbi/ast \
         --exclude-bvbrc data/bvbrc/kpneumoniae_amr_all.csv data/bvbrc/kpneumoniae_genomes.csv \
-        -o data/ncbi/ncbi_ast_bvbrc_format.csv --genomes-out data/ncbi/ncbi_ast_genomes.csv \
+        -o data/derived/ncbi_ast_bvbrc_format.csv --genomes-out data/derived/ncbi_ast_genomes.csv \
         --summary results/ncbi_cohort.txt
 
 Reads the BioSample XML batches written by scripts/download_ncbi_ast.sh and
