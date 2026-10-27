@@ -201,14 +201,40 @@ def load_subclass_map(path: str | Path) -> SubclassMap:
 # predictions
 
 
-def load_excluded_families(path: str | Path) -> dict[str, str]:
-    """CSV family,reason: gene families (or mutated genes) the predictor ignores."""
+@dataclass
+class Exclusions:
+    """Elements the predictor ignores: whole gene families, or single gene symbols."""
+    families: dict[str, str] = field(default_factory=dict)   # family -> reason
+    symbols: dict[str, str] = field(default_factory=dict)    # exact symbol -> reason
+
+
+def load_exclusions(path: str | Path) -> Exclusions:
+    """CSV family,reason[,match]: match is 'family' (default) or 'symbol'.
+
+    A family entry ignores every member (oqxA ignores oqxA, oqxA10, ...); a
+    symbol entry ignores that exact call only, so the chromosomal fosA of
+    K. pneumoniae can be ignored while acquired fosA3 still counts.
+    """
     with open(path, newline="", encoding="utf-8") as fh:
         lines = [t for t in fh if t.strip() and not t.lstrip().startswith("#")]
     reader = csv.DictReader(lines)
     if not reader.fieldnames or "family" not in reader.fieldnames:
         raise GenotypeError(f"{path}: header must include family")
-    return {r["family"].strip(): (r.get("reason") or "").strip() for r in reader if r["family"].strip()}
+    ex = Exclusions()
+    for r in reader:
+        name = r["family"].strip()
+        if not name:
+            continue
+        match = (r.get("match") or "family").strip().lower()
+        if match not in ("family", "symbol"):
+            raise GenotypeError(f"{path}: match must be 'family' or 'symbol', got {match!r} for {name}")
+        (ex.families if match == "family" else ex.symbols)[name] = (r.get("reason") or "").strip()
+    return ex
+
+
+def load_excluded_families(path: str | Path) -> dict[str, str]:
+    """Family-level entries of an exclusions CSV (see load_exclusions)."""
+    return load_exclusions(path).families
 
 
 @dataclass
@@ -225,9 +251,10 @@ def predict(
     smap: SubclassMap,
     excluded_families: Iterable[str] = (),
     excluded_methods: Iterable[str] = EXCLUDED_METHODS,
+    excluded_symbols: Iterable[str] = (),
 ) -> Prediction:
     calls = list(calls)
-    fams, methods = set(excluded_families), set(excluded_methods)
+    fams, methods, syms = set(excluded_families), set(excluded_methods), set(excluded_symbols)
     resistant: set[str] = set()
     unknown: list[str] = []
     ignored: list[str] = []
@@ -239,7 +266,7 @@ def predict(
         if sub is None:
             unknown.append(symbol)
             continue
-        if catalogue.family_of(symbol) in fams:
+        if symbol in syms or catalogue.family_of(symbol) in fams:
             ignored.append(symbol)
             continue
         resistant |= smap.predicts(sub)

@@ -1,18 +1,27 @@
 # Gene families and mutated genes the K. pneumoniae genotype predictor ignores.
-# DRAFT, pending review. Intrinsic chromosomal genes carried by essentially every
+# Reviewed 2026-10-27. Intrinsic chromosomal genes carried by essentially every
 # K. pneumoniae, and regulator or porin mutations with low or uncertain penetrance.
 # Chromosomal SHV/LEN/OKP beta-lactamases are NOT excluded: they correctly predict
 # the intrinsic ampicillin resistance.
-family,reason
-oqxA,intrinsic chromosomal efflux pump
-oqxB,intrinsic chromosomal efflux pump
-oqxR,regulator of oqxAB; low-level effect
-fosA,intrinsic chromosomal fosfomycin resistance gene
-emrD,intrinsic efflux (plus scope)
-kdeA,intrinsic efflux (plus scope)
-ramR,regulator mutation; low-level multidrug effect
-acrR,regulator mutation; low-level multidrug effect
-marR,regulator mutation; low-level multidrug effect
-ompK35,porin mutation; contributes to but does not confer carbapenem resistance alone
-ompK36,porin mutation; contributes to but does not confer carbapenem resistance alone
-ompK37,porin mutation; contributes to but does not confer carbapenem resistance alone
+# match=family ignores every member of the family; match=symbol ignores that exact call.
+# fosA: the chromosomal copy is reported as bare fosA, or as fosA5, fosA9 or fosA10 in
+# isolates that lack the bare call (31,170 Pathogen Detection isolates: fosA10 889 of 900,
+# fosA5 336 of 343 and fosA9 16 of 17 without bare fosA). fosA3, fosA4, fosA7 and fosA8
+# occur alongside it (fosA3 1,373 of 1,379; fosA7 886 of 889), so they are additional,
+# acquired genes and still count.
+family,reason,match
+oqxA,intrinsic chromosomal efflux pump,family
+oqxB,intrinsic chromosomal efflux pump,family
+oqxR,regulator of oqxAB; low-level effect,family
+fosA,chromosomal K. pneumoniae fosA (family-level call),symbol
+fosA5,chromosomal K. pneumoniae fosA allele,symbol
+fosA9,chromosomal K. pneumoniae fosA allele,symbol
+fosA10,chromosomal K. pneumoniae fosA allele,symbol
+emrD,intrinsic efflux (plus scope),family
+kdeA,intrinsic efflux (plus scope),family
+ramR,regulator mutation; low-level multidrug effect,family
+acrR,regulator mutation; low-level multidrug effect,family
+marR,regulator mutation; low-level multidrug effect,family
+ompK35,porin mutation; contributes to but does not confer carbapenem resistance alone,family
+ompK36,porin mutation; contributes to but does not confer carbapenem resistance alone,family
+ompK37,porin mutation; contributes to but does not confer carbapenem resistance alone,family

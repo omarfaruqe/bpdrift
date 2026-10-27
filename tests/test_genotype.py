@@ -4,6 +4,7 @@ import pytest
 
 from bpdrift.genotype import (
     GenotypeError,
+    load_exclusions,
     load_excluded_families,
     collapse_labels,
     error_rates,
@@ -168,3 +169,41 @@ def test_disruption_fallback(tmp_path):
     assert cat.lookup("mgrB_K43N") is None         # a missense change is not a disruption
     assert cat.lookup("acrR_W45Ter") is None       # disruption entry is for E. coli only
     assert cat.lookup("mcr-1.1") == "COLISTIN"
+
+
+def test_symbol_level_exclusion(tmp_path):
+    genes = tmp_path / "g.txt"
+    genes.write_text(
+        "allele\tgene_family\tclass\tsubclass\n"
+        "\tfosA\tFOSFOMYCIN\tFOSFOMYCIN\n"
+        "fosA3\tfosA\tFOSFOMYCIN\tFOSFOMYCIN\n"
+        "fosA5\tfosA\tFOSFOMYCIN\tFOSFOMYCIN\n",
+        encoding="utf-8",
+    )
+    cat = load_catalogue(genes)
+    m = tmp_path / "m.csv"
+    m.write_text("subclass_token,antibiotic\nFOSFOMYCIN,fosfomycin\n", encoding="utf-8")
+    smap = load_subclass_map(m)
+    ex_csv = tmp_path / "ex.csv"
+    ex_csv.write_text("family,reason,match\nfosA,chromosomal,symbol\nfosA5,chromosomal,symbol\n"
+                      "oqxA,efflux,family\noqxB,efflux,\n", encoding="utf-8")
+    ex = load_exclusions(ex_csv)
+    assert set(ex.symbols) == {"fosA", "fosA5"} and set(ex.families) == {"oqxA", "oqxB"}
+    assert load_excluded_families(ex_csv) == ex.families
+
+    def pred(text):
+        return predict(parse_amr_genotypes(text), cat, smap, excluded_families=ex.families,
+                       excluded_symbols=ex.symbols).resistant
+
+    assert pred("fosA=EXACT") == set()                       # chromosomal copy ignored
+    assert pred("fosA5=EXACT") == set()
+    assert pred("fosA=EXACT,fosA3=EXACT") == {"fosfomycin"}  # acquired gene of the same family counts
+    # excluding the whole family would also lose the acquired gene
+    assert predict(parse_amr_genotypes("fosA3=EXACT"), cat, smap, excluded_families={"fosA"}).resistant == set()
+
+
+def test_exclusion_match_must_be_known(tmp_path):
+    p = tmp_path / "ex.csv"
+    p.write_text("family,reason,match\nfosA,x,allele\n", encoding="utf-8")
+    with pytest.raises(GenotypeError, match="match must be"):
+        load_exclusions(p)

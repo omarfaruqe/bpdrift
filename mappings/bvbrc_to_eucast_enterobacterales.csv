@@ -2,7 +2,7 @@
 # Klebsiella pneumoniae in each table version. Reviewed by Md Omar Faruqe, 2026-10-26.
 # Empty eucast_agent: no applicable row in that version (reason in note).
 # restriction=urinary: the only Klebsiella breakpoint is urinary-tract specific.
-# v8.1, v9.0 and v14.0 links drafted 2026-10-27, pending review; earlier versions reviewed 2026-10-26.
+# v8.1, v9.0 and v14.0 links reviewed 2026-10-27 against each table's Enterobacterales rows; others reviewed 2026-10-26.
 bvbrc_antibiotic,eucast_version,eucast_agent,restriction,note
 amikacin,8.1,Amikacin,,"single row, before the systemic / urinary-tract split"
 amikacin,9.0,Amikacin,,"single row, before the systemic / urinary-tract split"

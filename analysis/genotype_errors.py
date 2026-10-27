@@ -32,7 +32,8 @@ from bpdrift.genotype import (
     collapse_labels,
     error_rates,
     load_catalogue,
-    load_excluded_families,
+    Exclusions,
+    load_exclusions,
     load_subclass_map,
     parse_amr_genotypes,
     predict,
@@ -88,7 +89,7 @@ def main(argv=None) -> int:
     p.add_argument("--genes", required=True)
     p.add_argument("--mutations")
     p.add_argument("--map", required=True)
-    p.add_argument("--exclude", help="CSV of gene families the predictor ignores")
+    p.add_argument("--exclude", help="CSV of gene families or symbols the predictor ignores")
     p.add_argument("-o", "--output", required=True)
     p.add_argument("--summary", required=True)
     a = p.parse_args(argv)
@@ -103,7 +104,7 @@ def main(argv=None) -> int:
     pd, pd_conflicts = read_pd_genotypes(a.pd_metadata)
     catalogue = load_catalogue(a.genes, a.mutations)
     smap = load_subclass_map(a.map)
-    excluded = load_excluded_families(a.exclude) if a.exclude else {}
+    excluded = load_exclusions(a.exclude) if a.exclude else Exclusions()
 
     predictions, unknown, ignored = {}, Counter(), Counter()
     lost = Counter()
@@ -119,7 +120,8 @@ def main(argv=None) -> int:
         if not calls:
             lost["empty AMR_genotypes"] += 1
             continue
-        pr = predict(calls, catalogue, smap, excluded_families=excluded)
+        pr = predict(calls, catalogue, smap, excluded_families=excluded.families,
+                     excluded_symbols=excluded.symbols)
         unknown.update(pr.unknown)
         ignored.update(x.split("=")[-1] if "=" in x else catalogue.family_of(x) for x in pr.ignored)
         predictions[g] = pr.resistant
@@ -160,7 +162,8 @@ def main(argv=None) -> int:
         fh.write(f"genomes with genotype predictions: {len(predictions)}\n")
         fh.write(f"Pathogen Detection BioSamples dropped for differing entries: {pd_conflicts}\n")
         fh.write(f"antibiotics predicted: {len(targets)}\n")
-        fh.write(f"excluded families: {', '.join(sorted(excluded)) or 'none'}\n")
+        fh.write(f"excluded families: {', '.join(sorted(excluded.families)) or 'none'}\n")
+        fh.write(f"excluded symbols: {', '.join(sorted(excluded.symbols)) or 'none'}\n")
         fh.write("element calls ignored (by method or excluded family):\n")
         for key, n in ignored.most_common():
             fh.write(f"    {key}: {n}\n")

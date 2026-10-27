@@ -1,7 +1,14 @@
 # AMRFinderPlus subclass token -> antibiotic predicted resistant (BV-BRC antibiotic names).
-# DRAFT, pending review. Used by the genotype arm (H3) as a fixed, deliberately simple
+# Reviewed 2026-10-27. Used by the genotype arm (H3) as a fixed, deliberately simple
 # predictor: an isolate is predicted resistant when any element's subclass token maps here.
 # Compound subclasses (e.g. AMIKACIN/KANAMYCIN/TOBRAMYCIN) are split on "/".
+# Known overcalls, kept so the predictor stays a plain reading of AMRFinderPlus subclasses:
+#   aac(6')-Ib (AMIKACIN/...) raises amikacin MICs but often not above the breakpoint;
+#   aac(6')-Ib-cr (.../QUINOLONE/...) predicts ciprofloxacin resistance on its own;
+#   a few aac(6') variants carry the generic AMINOGLYCOSIDE subclass and so also predict
+#   gentamicin (about 100 calls in 31,170 isolates; nearly all AMINOGLYCOSIDE calls are rmt);
+#   OXA-48-like carbapenemases predict cephalosporin resistance they confer only weakly;
+#   chromosomal SHV/LEN/OKP (BETA-LACTAM) predict piperacillin resistance in every isolate.
 subclass_token,antibiotic,note
 CARBAPENEM,imipenem,carbapenemase
 CARBAPENEM,meropenem,carbapenemase
