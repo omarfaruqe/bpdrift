@@ -103,6 +103,8 @@ python analysis/flip_rates.py data/derived/kpneumoniae_reinterpreted.csv -o resu
 python analysis/as_reported.py data/derived/kpneumoniae_reinterpreted.csv -o results/as_reported.csv
 python analysis/robustness.py data/derived/kpneumoniae_reinterpreted.csv \
     -o results/robustness.csv --transitions results/transitions.csv
+python analysis/by_source.py data/derived/kpneumoniae_reinterpreted.csv \
+    --bvbrc data/bvbrc/kpneumoniae_amr_all.csv -o results/by_source.csv
 G="--genomes data/bvbrc/kpneumoniae_genomes.csv --pd-metadata data/ncbi/PDG*.metadata.tsv \
    --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv \
    --map mappings/amrfinder_subclass_to_antibiotic.csv \
