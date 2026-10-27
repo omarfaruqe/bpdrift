@@ -29,7 +29,8 @@ REPORTED = {"Susceptible": "S", "Intermediate": "I", "Resistant": "R"}
 DECIDABLE = {"S", "I", "R"}
 
 # Year each loaded EUCAST version took effect (EUCAST publishes on 1 January).
-IN_FORCE = {"10.0": 2020, "13.1": 2023, "15.0": 2025, "16.1": 2026}
+IN_FORCE = {"8.1": 2018, "9.0": 2019, "10.0": 2020, "11.0": 2021, "12.0": 2022,
+            "13.1": 2023, "14.0": 2024, "15.0": 2025, "16.1": 2026}
 
 COLUMNS = [
     "standard", "year", "eucast_version", "in_force_that_year", "reported", "compared",
@@ -72,7 +73,8 @@ def in_force(standard: str, year: str, version: str) -> str:
     """'yes' when a stated EUCAST year is the year this version took effect.
 
     EUCAST issues one main version a year, so for the loaded versions this is
-    exact for 10.0, 15.0 and 16.1; 13.1 replaced 13.0 during 2023.
+    exact for whole-number versions; 8.1 replaced 8.0 in May 2018 and 13.1
+    replaced 13.0 during 2023.
     """
     if standard != "EUCAST" or not year.isdigit() or version not in IN_FORCE:
         return ""

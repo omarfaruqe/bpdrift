@@ -138,7 +138,8 @@ def _cmd_reinterpret(args) -> int:
           f"{s['excluded_duplicate']} duplicates", file=err)
     linked = s["records"] - sum(unlinked.values())
     print(f"interpreted {linked} records under {len(tables)} versions "
-          f"({', '.join(sorted(tables))}): {len(rows)} rows; "
+          f"({', '.join(sorted(tables, key=lambda v: tuple(int(x) for x in v.split('.'))))}): "
+          f"{len(rows)} rows; "
           f"{sum(unlinked.values())} records in {len(unlinked)} unlinked antibiotics", file=err)
     main = Counter(x.category.value for x in rows if x.in_main)
     print("main analysis categories: " + ", ".join(f"{k} {v}" for k, v in sorted(main.items())), file=err)

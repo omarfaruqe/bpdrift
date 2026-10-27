@@ -2,144 +2,250 @@
 # Klebsiella pneumoniae in each table version. Reviewed by Md Omar Faruqe, 2026-10-26.
 # Empty eucast_agent: no applicable row in that version (reason in note).
 # restriction=urinary: the only Klebsiella breakpoint is urinary-tract specific.
+# v8.1, v9.0 and v14.0 links drafted 2026-10-27, pending review; earlier versions reviewed 2026-10-26.
 bvbrc_antibiotic,eucast_version,eucast_agent,restriction,note
-meropenem,10.0,Meropenem,,
-meropenem,13.1,Meropenem (indications other than meningitis),,indication split: non-meningitis row
-meropenem,15.0,Meropenem (indications other than meningitis),,indication split: non-meningitis row
-meropenem,16.1,Meropenem (indications other than meningitis),,indication split: non-meningitis row
-ciprofloxacin,10.0,Ciprofloxacin,,
-ciprofloxacin,13.1,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
-ciprofloxacin,15.0,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
-ciprofloxacin,16.1,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
-gentamicin,10.0,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
-gentamicin,13.1,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
-gentamicin,15.0,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
-gentamicin,16.1,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
-ceftazidime,10.0,Ceftazidime,,
-ceftazidime,13.1,Ceftazidime,,
-ceftazidime,15.0,Ceftazidime,,
-ceftazidime,16.1,Ceftazidime,,
+amikacin,8.1,Amikacin,,"single row, before the systemic / urinary-tract split"
+amikacin,9.0,Amikacin,,"single row, before the systemic / urinary-tract split"
 amikacin,10.0,Amikacin (systemic infections),,systemic row chosen over urinary-tract row
 amikacin,13.1,Amikacin (systemic infections),,systemic row chosen over urinary-tract row
+amikacin,14.0,Amikacin (systemic infections),,systemic row chosen over urinary-tract row
 amikacin,15.0,Amikacin (systemic infections),,systemic row chosen over urinary-tract row
 amikacin,16.1,Amikacin (systemic infections),,systemic row chosen over urinary-tract row
-imipenem,10.0,Imipenem,,
-imipenem,13.1,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
-imipenem,15.0,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
-imipenem,16.1,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
-cefepime,10.0,Cefepime,,
-cefepime,13.1,Cefepime,,
-cefepime,15.0,Cefepime,,
-cefepime,16.1,Cefepime,,
-aztreonam,10.0,Aztreonam,,
-aztreonam,13.1,Aztreonam,,
-aztreonam,15.0,Aztreonam,,
-aztreonam,16.1,Aztreonam,,
-piperacillin/tazobactam,10.0,Piperacillin-tazobactam,,
-piperacillin/tazobactam,13.1,Piperacillin-tazobactam,,
-piperacillin/tazobactam,15.0,Piperacillin-tazobactam,,
-piperacillin/tazobactam,16.1,Piperacillin-tazobactam,,
-ampicillin,10.0,Ampicillin,,
-ampicillin,13.1,Ampicillin iv,,route split: iv row
-ampicillin,15.0,Ampicillin iv,,route split: iv row
-ampicillin,16.1,Ampicillin iv,,route split: iv row
-cefuroxime,10.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,
-cefuroxime,13.1,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
-cefuroxime,15.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
-cefuroxime,16.1,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
-trimethoprim/sulfamethoxazole,10.0,Trimethoprim-sulfamethoxazole,,
-trimethoprim/sulfamethoxazole,13.1,Trimethoprim-sulfamethoxazole,,
-trimethoprim/sulfamethoxazole,15.0,Trimethoprim-sulfamethoxazole,,
-trimethoprim/sulfamethoxazole,16.1,"Trimethoprim-sulfamethoxazole, Enterobacterales except Serratia spp.",,organism split: row covering Klebsiella
-levofloxacin,10.0,Levofloxacin,,
-levofloxacin,13.1,Levofloxacin,,
-levofloxacin,15.0,Levofloxacin,,
-levofloxacin,16.1,Levofloxacin,,
-ceftriaxone,10.0,Ceftriaxone,,
-ceftriaxone,13.1,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
-ceftriaxone,15.0,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
-ceftriaxone,16.1,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
-tobramycin,10.0,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
-tobramycin,13.1,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
-tobramycin,15.0,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
-tobramycin,16.1,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
-ampicillin/sulbactam,10.0,Ampicillin-sulbactam,,
-ampicillin/sulbactam,13.1,Ampicillin-sulbactam iv,,route split: iv row
-ampicillin/sulbactam,15.0,Ampicillin-sulbactam iv,,route split: iv row
-ampicillin/sulbactam,16.1,Ampicillin-sulbactam iv,,route split: iv row
-cefazolin,10.0,"Cefazolin (infections originating from the urinary tract), E. coli, and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefazolin,13.1,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefazolin,15.0,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefazolin,16.1,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefotaxime,10.0,Cefotaxime,,
-cefotaxime,13.1,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
-cefotaxime,15.0,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
-cefotaxime,16.1,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
-ertapenem,10.0,Ertapenem,,
-ertapenem,13.1,Ertapenem,,
-ertapenem,15.0,Ertapenem,,
-ertapenem,16.1,Ertapenem,,
-amoxicillin/clavulanic acid,10.0,Amoxicillin-clavulanic acid,,general row chosen over the uncomplicated-UTI row
-amoxicillin/clavulanic acid,13.1,Amoxicillin-clavulanic acid iv,,route split: iv row
-amoxicillin/clavulanic acid,15.0,Amoxicillin-clavulanic acid iv,,route split: iv row
-amoxicillin/clavulanic acid,16.1,Amoxicillin-clavulanic acid iv,,route split: iv row
-colistin,10.0,Colistin,,
-colistin,13.1,Colistin,,
-colistin,15.0,Colistin,,
-colistin,16.1,Colistin,,
-fosfomycin,10.0,Fosfomycin iv,,
-fosfomycin,13.1,Fosfomycin iv,,route split: iv row
-fosfomycin,15.0,"Fosfomycin iv, other Enterobacterales",,route split: iv row
-fosfomycin,16.1,"Fosfomycin iv, other Enterobacterales",,route split: iv row
-doripenem,10.0,,,agent not in this version
-doripenem,13.1,Doripenem,,
-doripenem,15.0,Doripenem,,
-doripenem,16.1,Doripenem,,
-chloramphenicol,10.0,Chloramphenicol,,
-chloramphenicol,13.1,Chloramphenicol,,
-chloramphenicol,15.0,Chloramphenicol,,
-chloramphenicol,16.1,Chloramphenicol,,
-piperacillin,10.0,Piperacillin,,
-piperacillin,13.1,Piperacillin,,
-piperacillin,15.0,Piperacillin,,
-piperacillin,16.1,Piperacillin,,
+amoxicillin,8.1,Amoxicillin,,
+amoxicillin,9.0,Amoxicillin,,
 amoxicillin,10.0,Amoxicillin,,
 amoxicillin,13.1,Amoxicillin iv,,route split: iv row
+amoxicillin,14.0,Amoxicillin iv,,route split: iv row
 amoxicillin,15.0,Amoxicillin iv,,route split: iv row
 amoxicillin,16.1,Amoxicillin iv,,route split: iv row
-ceftazidime/avibactam,10.0,Ceftazidime-avibactam,,
-ceftazidime/avibactam,13.1,Ceftazidime-avibactam,,
-ceftazidime/avibactam,15.0,Ceftazidime-avibactam,,
-ceftazidime/avibactam,16.1,Ceftazidime-avibactam,,
-cefpodoxime,10.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefpodoxime,13.1,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefpodoxime,15.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-cefpodoxime,16.1,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-ceftolozane/tazobactam,10.0,Ceftolozane-tazobactam,,
-ceftolozane/tazobactam,13.1,Ceftolozane-tazobactam,,
-ceftolozane/tazobactam,15.0,Ceftolozane-tazobactam,,
-ceftolozane/tazobactam,16.1,Ceftolozane-tazobactam,,
-trimethoprim,10.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-trimethoprim,13.1,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-trimethoprim,15.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
-trimethoprim,16.1,"Trimethoprim (uncomplicated UTI only), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+amoxicillin/clavulanic acid,8.1,Amoxicillin-clavulanic acid,,general row chosen over the uncomplicated-UTI row
+amoxicillin/clavulanic acid,9.0,Amoxicillin-clavulanic acid,,general row chosen over the uncomplicated-UTI row
+amoxicillin/clavulanic acid,10.0,Amoxicillin-clavulanic acid,,general row chosen over the uncomplicated-UTI row
+amoxicillin/clavulanic acid,13.1,Amoxicillin-clavulanic acid iv,,route split: iv row
+amoxicillin/clavulanic acid,14.0,Amoxicillin-clavulanic acid iv,,route split: iv row
+amoxicillin/clavulanic acid,15.0,Amoxicillin-clavulanic acid iv,,route split: iv row
+amoxicillin/clavulanic acid,16.1,Amoxicillin-clavulanic acid iv,,route split: iv row
+ampicillin,8.1,Ampicillin,,
+ampicillin,9.0,Ampicillin,,
+ampicillin,10.0,Ampicillin,,
+ampicillin,13.1,Ampicillin iv,,route split: iv row
+ampicillin,14.0,Ampicillin iv,,route split: iv row
+ampicillin,15.0,Ampicillin iv,,route split: iv row
+ampicillin,16.1,Ampicillin iv,,route split: iv row
+ampicillin/sulbactam,8.1,Ampicillin-sulbactam,,
+ampicillin/sulbactam,9.0,Ampicillin-sulbactam,,
+ampicillin/sulbactam,10.0,Ampicillin-sulbactam,,
+ampicillin/sulbactam,13.1,Ampicillin-sulbactam iv,,route split: iv row
+ampicillin/sulbactam,14.0,Ampicillin-sulbactam iv,,route split: iv row
+ampicillin/sulbactam,15.0,Ampicillin-sulbactam iv,,route split: iv row
+ampicillin/sulbactam,16.1,Ampicillin-sulbactam iv,,route split: iv row
+aztreonam,8.1,Aztreonam,,
+aztreonam,9.0,Aztreonam,,
+aztreonam,10.0,Aztreonam,,
+aztreonam,13.1,Aztreonam,,
+aztreonam,14.0,Aztreonam,,
+aztreonam,15.0,Aztreonam,,
+aztreonam,16.1,Aztreonam,,
+cefazolin,8.1,Cefazolin,urinary,"row present, no breakpoint ('-')"
+cefazolin,9.0,Cefazolin,urinary,"row present, no breakpoint ('-')"
+cefazolin,10.0,"Cefazolin (infections originating from the urinary tract), E. coli, and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefazolin,13.1,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefazolin,14.0,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefazolin,15.0,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefazolin,16.1,"Cefazolin (infections originating from the urinary tract), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefepime,8.1,Cefepime,,
+cefepime,9.0,Cefepime,,
+cefepime,10.0,Cefepime,,
+cefepime,13.1,Cefepime,,
+cefepime,14.0,Cefepime,,
+cefepime,15.0,Cefepime,,
+cefepime,16.1,Cefepime,,
+cefiderocol,8.1,,,agent not in this version
+cefiderocol,9.0,,,agent not in this version
 cefiderocol,10.0,,,agent not in this version
 cefiderocol,13.1,Cefiderocol,,
+cefiderocol,14.0,Cefiderocol,,
 cefiderocol,15.0,Cefiderocol,,
 cefiderocol,16.1,Cefiderocol,,
-imipenem/relebactam,10.0,"Imipenem-relebactam, Enterobacterales except Morganella spp.",,
-imipenem/relebactam,13.1,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
-imipenem/relebactam,15.0,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
-imipenem/relebactam,16.1,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+cefotaxime,8.1,Cefotaxime,,
+cefotaxime,9.0,Cefotaxime,,
+cefotaxime,10.0,Cefotaxime,,
+cefotaxime,13.1,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
+cefotaxime,14.0,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
+cefotaxime,15.0,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
+cefotaxime,16.1,Cefotaxime (indications other than meningitis),,indication split: non-meningitis row
+cefpodoxime,8.1,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,9.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,10.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,13.1,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,14.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,15.0,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+cefpodoxime,16.1,Cefpodoxime (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+ceftaroline,8.1,Ceftaroline,,
+ceftaroline,9.0,Ceftaroline,,
 ceftaroline,10.0,Ceftaroline,,
 ceftaroline,13.1,Ceftaroline,,
+ceftaroline,14.0,Ceftaroline,,
 ceftaroline,15.0,Ceftaroline,,
 ceftaroline,16.1,Ceftaroline,,
-ticarcillin/clavulanic acid,10.0,Ticarcillin-clavulanic acid,,
-ticarcillin/clavulanic acid,13.1,Ticarcillin-clavulanic acid,,
-ticarcillin/clavulanic acid,15.0,Ticarcillin-clavulanic acid,,
-ticarcillin/clavulanic acid,16.1,Ticarcillin-clavulanic acid,,
+ceftazidime,8.1,Ceftazidime,,
+ceftazidime,9.0,Ceftazidime,,
+ceftazidime,10.0,Ceftazidime,,
+ceftazidime,13.1,Ceftazidime,,
+ceftazidime,14.0,Ceftazidime,,
+ceftazidime,15.0,Ceftazidime,,
+ceftazidime,16.1,Ceftazidime,,
+ceftazidime/avibactam,8.1,Ceftazidime-avibactam,,
+ceftazidime/avibactam,9.0,Ceftazidime-avibactam,,
+ceftazidime/avibactam,10.0,Ceftazidime-avibactam,,
+ceftazidime/avibactam,13.1,Ceftazidime-avibactam,,
+ceftazidime/avibactam,14.0,Ceftazidime-avibactam,,
+ceftazidime/avibactam,15.0,Ceftazidime-avibactam,,
+ceftazidime/avibactam,16.1,Ceftazidime-avibactam,,
+ceftolozane/tazobactam,8.1,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,9.0,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,10.0,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,13.1,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,14.0,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,15.0,Ceftolozane-tazobactam,,
+ceftolozane/tazobactam,16.1,Ceftolozane-tazobactam,,
+ceftriaxone,8.1,Ceftriaxone,,
+ceftriaxone,9.0,Ceftriaxone,,
+ceftriaxone,10.0,Ceftriaxone,,
+ceftriaxone,13.1,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
+ceftriaxone,14.0,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
+ceftriaxone,15.0,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
+ceftriaxone,16.1,Ceftriaxone (indications other than meningitis),,indication split: non-meningitis row
+cefuroxime,8.1,"Cefuroxime iv, E. coli, Klebsiella spp. and P. mirabilis",,iv row naming Klebsiella; organism list extended in v9.0
+cefuroxime,9.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,
+cefuroxime,10.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,
+cefuroxime,13.1,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
+cefuroxime,14.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
+cefuroxime,15.0,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
+cefuroxime,16.1,"Cefuroxime iv, E. coli, Klebsiella spp. (except K. aerogenes), Raoultella spp. and P. mirabilis",,route split: iv row
+chloramphenicol,8.1,Chloramphenicol,,
+chloramphenicol,9.0,Chloramphenicol,,
+chloramphenicol,10.0,Chloramphenicol,,
+chloramphenicol,13.1,Chloramphenicol,,
+chloramphenicol,14.0,Chloramphenicol,,
+chloramphenicol,15.0,Chloramphenicol,,
+chloramphenicol,16.1,Chloramphenicol,,
+ciprofloxacin,8.1,Ciprofloxacin,,
+ciprofloxacin,9.0,Ciprofloxacin,,
+ciprofloxacin,10.0,Ciprofloxacin,,
+ciprofloxacin,13.1,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
+ciprofloxacin,14.0,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
+ciprofloxacin,15.0,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
+ciprofloxacin,16.1,Ciprofloxacin (indications other than meningitis),,indication split: non-meningitis row
+colistin,8.1,Colistin,,
+colistin,9.0,Colistin,,
+colistin,10.0,Colistin,,
+colistin,13.1,Colistin,,
+colistin,14.0,Colistin,,
+colistin,15.0,Colistin,,
+colistin,16.1,Colistin,,
+doripenem,8.1,Doripenem,,
+doripenem,9.0,Doripenem,,row present with empty breakpoint cells
+doripenem,10.0,,,agent not in this version
+doripenem,13.1,Doripenem,,
+doripenem,14.0,Doripenem,,
+doripenem,15.0,Doripenem,,
+doripenem,16.1,Doripenem,,
+ertapenem,8.1,Ertapenem,,
+ertapenem,9.0,Ertapenem,,
+ertapenem,10.0,Ertapenem,,
+ertapenem,13.1,Ertapenem,,
+ertapenem,14.0,Ertapenem,,
+ertapenem,15.0,Ertapenem,,
+ertapenem,16.1,Ertapenem,,
+fosfomycin,8.1,Fosfomycin iv,,
+fosfomycin,9.0,Fosfomycin iv,,
+fosfomycin,10.0,Fosfomycin iv,,
+fosfomycin,13.1,Fosfomycin iv,,route split: iv row
+fosfomycin,14.0,"Fosfomycin iv, other Enterobacterales",,organism split: Klebsiella falls under other Enterobacterales
+fosfomycin,15.0,"Fosfomycin iv, other Enterobacterales",,route split: iv row
+fosfomycin,16.1,"Fosfomycin iv, other Enterobacterales",,route split: iv row
+gentamicin,8.1,Gentamicin,,"single row, before the systemic / urinary-tract split"
+gentamicin,9.0,Gentamicin,,"single row, before the systemic / urinary-tract split"
+gentamicin,10.0,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
+gentamicin,13.1,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
+gentamicin,14.0,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
+gentamicin,15.0,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
+gentamicin,16.1,Gentamicin (systemic infections),,systemic row chosen over urinary-tract row
+imipenem,8.1,Imipenem,,
+imipenem,9.0,Imipenem,,
+imipenem,10.0,Imipenem,,
+imipenem,13.1,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem,14.0,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem,15.0,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem,16.1,"Imipenem, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem/relebactam,8.1,,,agent not in this version
+imipenem/relebactam,9.0,,,agent not in this version
+imipenem/relebactam,10.0,"Imipenem-relebactam, Enterobacterales except Morganella spp.",,
+imipenem/relebactam,13.1,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem/relebactam,14.0,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem/relebactam,15.0,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+imipenem/relebactam,16.1,"Imipenem-relebactam, Enterobacterales except Morganellaceae",,organism split: row covering Klebsiella
+levofloxacin,8.1,Levofloxacin,,
+levofloxacin,9.0,Levofloxacin,,
+levofloxacin,10.0,Levofloxacin,,
+levofloxacin,13.1,Levofloxacin,,
+levofloxacin,14.0,Levofloxacin,,
+levofloxacin,15.0,Levofloxacin,,
+levofloxacin,16.1,Levofloxacin,,
+meropenem,8.1,Meropenem,,
+meropenem,9.0,Meropenem,,
+meropenem,10.0,Meropenem,,
+meropenem,13.1,Meropenem (indications other than meningitis),,indication split: non-meningitis row
+meropenem,14.0,Meropenem (indications other than meningitis),,indication split: non-meningitis row
+meropenem,15.0,Meropenem (indications other than meningitis),,indication split: non-meningitis row
+meropenem,16.1,Meropenem (indications other than meningitis),,indication split: non-meningitis row
+moxifloxacin,8.1,Moxifloxacin,,
+moxifloxacin,9.0,Moxifloxacin,,
 moxifloxacin,10.0,Moxifloxacin,,
 moxifloxacin,13.1,Moxifloxacin,,
+moxifloxacin,14.0,"Moxifloxacin, Enterobacterales except Morganella morganii, Proteus spp. and Serratia spp.",,organism split: Klebsiella is not in the excepted genera
 moxifloxacin,15.0,"Moxifloxacin, Enterobacterales except Morganella morganii, Proteus spp. and Serratia spp.",,organism split: Klebsiella is not in the excepted genera
 moxifloxacin,16.1,"Moxifloxacin, Enterobacterales except Morganella morganii, Proteus spp. and Serratia spp.",,organism split: Klebsiella is not in the excepted genera
+piperacillin,8.1,Piperacillin,,
+piperacillin,9.0,Piperacillin,,
+piperacillin,10.0,Piperacillin,,
+piperacillin,13.1,Piperacillin,,
+piperacillin,14.0,Piperacillin,,
+piperacillin,15.0,Piperacillin,,
+piperacillin,16.1,Piperacillin,,
+piperacillin/tazobactam,8.1,Piperacillin-tazobactam,,
+piperacillin/tazobactam,9.0,Piperacillin-tazobactam,,
+piperacillin/tazobactam,10.0,Piperacillin-tazobactam,,
+piperacillin/tazobactam,13.1,Piperacillin-tazobactam,,
+piperacillin/tazobactam,14.0,Piperacillin-tazobactam,,
+piperacillin/tazobactam,15.0,Piperacillin-tazobactam,,
+piperacillin/tazobactam,16.1,Piperacillin-tazobactam,,
+ticarcillin/clavulanic acid,8.1,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,9.0,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,10.0,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,13.1,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,14.0,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,15.0,Ticarcillin-clavulanic acid,,
+ticarcillin/clavulanic acid,16.1,Ticarcillin-clavulanic acid,,
+tobramycin,8.1,Tobramycin,,"single row, before the systemic / urinary-tract split"
+tobramycin,9.0,Tobramycin,,"single row, before the systemic / urinary-tract split"
+tobramycin,10.0,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
+tobramycin,13.1,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
+tobramycin,14.0,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
+tobramycin,15.0,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
+tobramycin,16.1,Tobramycin (systemic infections),,systemic row chosen over urinary-tract row
+trimethoprim,8.1,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,9.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,10.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,13.1,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,14.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,15.0,Trimethoprim (uncomplicated UTI only),urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim,16.1,"Trimethoprim (uncomplicated UTI only), E. coli and Klebsiella spp. (except K. aerogenes)",urinary,only breakpoint covering Klebsiella is urinary-tract specific
+trimethoprim/sulfamethoxazole,8.1,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,9.0,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,10.0,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,13.1,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,14.0,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,15.0,Trimethoprim-sulfamethoxazole,,
+trimethoprim/sulfamethoxazole,16.1,"Trimethoprim-sulfamethoxazole, Enterobacterales except Serratia spp.",,organism split: row covering Klebsiella

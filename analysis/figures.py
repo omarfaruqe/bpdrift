@@ -25,7 +25,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]  # validated, fixed order
+SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]  # validated, fixed order
 INK, INK_2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 MIN_RECORDS = 200  # antibiotics with fewer decidable pairs are left out of Fig. 1
 
@@ -45,7 +45,13 @@ def _pretty(ab: str) -> str:
     return ab.replace("/", "-")
 
 
-def figure_1(flips, out: Path, a="10.0", b="16.1"):
+def _vkey(v):
+    return tuple(int(x) for x in v.split("."))
+
+
+def figure_1(flips, out: Path, a=None, b=None):
+    versions = sorted({r["version_a"] for r in flips} | {r["version_b"] for r in flips}, key=_vkey)
+    a, b = a or versions[0], b or versions[-1]
     pick = {(r["scenario"], r["antibiotic"]): r for r in flips
             if r["version_a"] == a and r["version_b"] == b and r["antibiotic"] != "ALL"}
     drugs = [ab for (sc, ab), r in pick.items() if sc == "main" and int(r["both_decidable"]) >= MIN_RECORDS]
@@ -71,15 +77,17 @@ def figure_1(flips, out: Path, a="10.0", b="16.1"):
                             xytext=(8, 0), textcoords="offset points", va="center", fontsize=8, color=INK)
     ax.set_yticks(range(len(drugs)), [_pretty(d) for d in drugs])
     ax.set_ylim(-0.6, len(drugs) - 0.4)
-    ax.set_xlim(-0.6, 27)
+    widest = max(100 * float(pick[(sc, ab)]["flip_hi"]) for sc in ("main", "sign_exact") for ab in drugs)
+    ax.set_xlim(-0.6, widest * 1.45 + 2)
     ax.set_xlabel(f"Records whose S/I/R category differs between EUCAST v{a} and v{b} (%)")
     ax.xaxis.grid(True, color=GRID, lw=0.8)
     ax.set_axisbelow(True)
     ax.tick_params(axis="y", length=0)
     ax.spines["left"].set_visible(False)
     ax.legend(loc="lower right", frameon=False, fontsize=8)
-    fig.text(0.01, 0.995, "Breakpoint revisions changed the labels of two widely tested Klebsiella drugs",
-             fontsize=10, fontweight="bold", va="top")
+    changed = sum(int(pick[("main", ab)]["flips"]) > 0 for ab in drugs)
+    fig.text(0.01, 0.995, f"Breakpoint revisions from v{a} to v{b} changed labels for {changed} of "
+             f"{len(drugs)} Klebsiella drugs", fontsize=10, fontweight="bold", va="top")
     fig.text(0.01, 0.005, "K. pneumoniae, BV-BRC laboratory MICs; records decidable under both versions; "
              "bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
     fig.tight_layout(rect=(0, 0.02, 1, 0.96))
@@ -89,8 +97,9 @@ def figure_1(flips, out: Path, a="10.0", b="16.1"):
 
 
 def figure_2(agree, out: Path):
-    versions = ["10.0", "13.1", "15.0", "16.1"]
+    versions = sorted({r["eucast_version"] for r in agree}, key=_vkey)
     strata = [  # (standard, year, label, marker)
+        ("EUCAST", "2019", "EUCAST, stated year 2019", "v"),
         ("EUCAST", "2020", "EUCAST, stated year 2020", "o"),
         ("EUCAST", "all", "EUCAST, all years", "D"),
         ("none", "all", "No standard stated", "s"),
@@ -99,6 +108,8 @@ def figure_2(agree, out: Path):
     idx = {(r["standard"], r["year"], r["eucast_version"]): r for r in agree}
     fig, ax = plt.subplots(figsize=(7.0, 3.6))
     x = range(len(versions))
+    # a stratum is drawn only when it has reported calls under every version
+    strata = [s for s in strata if all((s[0], s[1], v) in idx for v in versions)]
     for k, (std, year, label, marker) in enumerate(strata):
         rows = [idx[(std, year, v)] for v in versions]
         p = [100 * float(r["r_line_rate"]) for r in rows]
@@ -109,9 +120,10 @@ def figure_2(agree, out: Path):
         n = rows[-1]["compared"]
         ax.annotate(f"{label}  (n = {n})", (x[-1], p[-1]), xytext=(10, 0), textcoords="offset points",
                     va="center", fontsize=8, color=INK)
-    v10 = idx[("EUCAST", "2020", "10.0")]
-    ax.text(-0.08, 100.45, f"v10.0 was in force in 2020: all {v10['compared']} of those reported calls "
-            "are reproduced", fontsize=7.5, color=INK_2, va="bottom")
+    valid = [idx[k] for k in (("EUCAST", "2019", "9.0"), ("EUCAST", "2020", "10.0")) if k in idx]
+    note = "; ".join(f"stated {r['year']} vs v{r['eucast_version']} (then in force): "
+                     f"{r['agreement']}/{r['compared']} reproduced" for r in valid)
+    ax.text(-0.08, 100.45, note, fontsize=7.5, color=INK_2, va="bottom")
     ax.set_xticks(list(x), [f"v{v}" for v in versions])
     ax.set_xlim(-0.3, len(versions) - 1 + 1.9)
     ax.set_ylim(91.5, 101.2)
@@ -123,7 +135,7 @@ def figure_2(agree, out: Path):
     fig.text(0.01, 0.995, "Reported labels match the EUCAST version they were made under, then drift",
              fontsize=10, fontweight="bold", va="top")
     fig.text(0.01, 0.01, "Agreement on resistant vs not resistant; K. pneumoniae, BV-BRC, main analysis.\n"
-             "n = records compared under v16.1; bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
+             f"n = records compared under v{versions[-1]}; bars are Wilson 95% intervals.", fontsize=7, color=INK_2)
     fig.tight_layout(rect=(0, 0.06, 1, 0.94))
     for ext in ("png", "svg"):
         fig.savefig(out / f"figure2_reported_agreement.{ext}", dpi=300)
