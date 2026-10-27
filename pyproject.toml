@@ -9,8 +9,27 @@ description = "Version-pinned interpretation of MIC values under EUCAST breakpoi
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{ name = "Md Omar Faruqe" }]
+authors = [{ name = "Md Omar Faruqe", email = "faruqe@ru.ac.bd" }]
+keywords = ["antimicrobial resistance", "EUCAST", "MIC", "breakpoints", "AST", "bioinformatics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
 dependencies = ["openpyxl>=3.1"]
+
+[project.urls]
+Homepage = "https://github.com/omarfaruqe/bpdrift"
+Source = "https://github.com/omarfaruqe/bpdrift"
+Issues = "https://github.com/omarfaruqe/bpdrift/issues"
+Changelog = "https://github.com/omarfaruqe/bpdrift/blob/main/CHANGELOG.md"
 
 [project.scripts]
 bpdrift = "bpdrift.cli:main"
