@@ -187,7 +187,7 @@ def main(argv=None) -> int:
         fh.write(f"genome-drug-version labels dropped for disagreeing records: {label_conflicts}\n")
         if a.matched:
             fh.write(f"matched: genome-drug pairs dropped for lacking an S/I/R label under some version: {unmatched}\n")
-        for reason, n in lost.most_common():
+        for reason, n in sorted(lost.items(), key=lambda kv: (-kv[1], kv[0])):
             fh.write(f"genomes lost, {reason}: {n}\n")
         fh.write(f"genomes with genotype predictions: {len(predictions)}\n")
         fh.write(f"Pathogen Detection BioSamples dropped for differing entries: {pd_conflicts}\n")
@@ -195,11 +195,11 @@ def main(argv=None) -> int:
         fh.write(f"excluded families: {', '.join(sorted(excluded.families)) or 'none'}\n")
         fh.write(f"excluded symbols: {', '.join(sorted(excluded.symbols)) or 'none'}\n")
         fh.write("element calls ignored (by method or excluded family):\n")
-        for key, n in ignored.most_common():
+        for key, n in sorted(ignored.items(), key=lambda kv: (-kv[1], kv[0])):
             fh.write(f"    {key}: {n}\n")
         fh.write(f"element symbols not in the AMRFinderPlus catalogue: {sum(unknown.values())} "
                  f"({len(unknown)} distinct)\n")
-        for sym, n in unknown.most_common(25):
+        for sym, n in sorted(unknown.items(), key=lambda kv: (-kv[1], kv[0]))[:25]:
             fh.write(f"    {sym}: {n}\n")
     print(f"wrote {a.output} and {a.summary}")
     return 0
