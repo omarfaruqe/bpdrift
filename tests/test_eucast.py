@@ -169,6 +169,12 @@ def test_unrecognised_value_fails_loudly(tmp_path, bad):
         read_eucast_xlsx(path)
 
 
+def test_header_spacing_is_ignored(tmp_path):
+    # v8.1 writes the R header as "R>" with no space
+    t = read_eucast_xlsx(build(tmp_path / "nospace.xlsx", header_r="R>"))
+    assert any(r.agent == "Omegamycin" for r in t.rows)
+
+
 def test_unexpected_header_fails_loudly(tmp_path):
     path = build(tmp_path / "hdr.xlsx", header_r="R ≥")
     with pytest.raises(EucastFormatError, match="expected 'S ≤' / 'R >'"):

@@ -20,6 +20,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Iterable
 
 from bpdrift.diff import norm
 from bpdrift.eucast import EucastTable, MICRow
@@ -89,11 +90,19 @@ def load_links(path: str | Path) -> Links:
     return links
 
 
-def resolve(links: Links, tables: dict[str, EucastTable], group: str) -> dict[tuple[str, str], MICRow | None]:
+def resolve(
+    links: Links, tables: dict[str, EucastTable], group: str | Iterable[str]
+) -> dict[tuple[str, str], MICRow | None]:
     """Find the table row for every link; fail on any link that does not resolve.
+
+    group may be several names for the same organism group, for a sheet
+    EUCAST renamed between versions (Enterobacteriaceae -> Enterobacterales).
 
     Returns {(normalised antibiotic, version): row or None}.
     """
+    given = [group] if isinstance(group, str) else list(group)
+    names = {norm(g) for g in given}
+    label = " / ".join(given)
     found: dict[tuple[str, str], MICRow | None] = {}
     for key, link in links.entries.items():
         table = tables.get(link.version)
@@ -103,10 +112,10 @@ def resolve(links: Links, tables: dict[str, EucastTable], group: str) -> dict[tu
             found[key] = None
             continue
         rows = [r for r in table.rows
-                if norm(group) in (norm(r.group), norm(r.sheet)) and norm(r.agent) == norm(link.agent)]
+                if names & {norm(r.group), norm(r.sheet)} and norm(r.agent) == norm(link.agent)]
         if not rows:
-            raise LinkError(f"line {link.line}: no {link.agent!r} in {group} of v{link.version}")
+            raise LinkError(f"line {link.line}: no {link.agent!r} in {label} of v{link.version}")
         if len(rows) > 1:
-            raise LinkError(f"line {link.line}: {link.agent!r} is ambiguous in {group} of v{link.version}")
+            raise LinkError(f"line {link.line}: {link.agent!r} is ambiguous in {label} of v{link.version}")
         found[key] = rows[0]
     return found

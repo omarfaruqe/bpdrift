@@ -208,7 +208,7 @@ def _read_sheet(ws) -> list[MICRow]:
         subgroup = _subgroup(ws, hdr_row, floor)
         s_label = _split(ws.cell(hdr_row + 1, 2).value)[0].strip()
         r_label = _split(ws.cell(hdr_row + 1, 3).value)[0].strip()
-        if not s_label.endswith("≤") or r_label != "R >":
+        if not s_label.endswith("≤") or "".join(r_label.split()) != "R>":
             raise EucastFormatError(
                 f"{ws.title}!B{hdr_row + 1}: expected 'S ≤' / 'R >' under the MIC header, "
                 f"got {s_label!r} / {r_label!r}"

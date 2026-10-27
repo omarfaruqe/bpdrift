@@ -83,3 +83,15 @@ def test_bad_links(tmp_path, body, message):
 def test_bad_header(tmp_path):
     with pytest.raises(LinkError, match="header must be"):
         load_links(write(tmp_path, "", header="antibiotic,version\n"))
+
+
+def test_resolve_accepts_renamed_sheets(tmp_path):
+    tables = {
+        "8.1": EucastTable("8.1", None, [mk("Alphacillin", sheet="Testobacteriaceae")]),
+        "16.1": EucastTable("16.1", None, [mk("Alphacillin")]),
+    }
+    links = load_links(write(tmp_path, "alpha,8.1,Alphacillin,,\nalpha,16.1,Alphacillin,,\n"))
+    with pytest.raises(LinkError, match="no 'Alphacillin' in Testobacterales of v8.1"):
+        resolve(links, tables, "Testobacterales")
+    found = resolve(links, tables, ["Testobacterales", "Testobacteriaceae"])
+    assert found[("alpha", "8.1")].sheet == "Testobacteriaceae"

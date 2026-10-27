@@ -119,7 +119,7 @@ def _cmd_reinterpret(args) -> int:
         tables[t.version] = t
     imp = read_bvbrc_csv(args.bvbrc)
     links = load_links(args.links)
-    rows, unlinked = reinterpret(imp.records, tables, links, args.group)
+    rows, unlinked = reinterpret(imp.records, tables, links, args.group)  # one or more names
 
     out = open(args.output, "w", newline="", encoding="utf-8") if args.output else sys.stdout
     try:
@@ -182,7 +182,9 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("reinterpret", help="interpret BV-BRC MICs under several tables")
     sp.add_argument("--bvbrc", required=True, help="BV-BRC genome_amr CSV export")
     sp.add_argument("--links", required=True, help="antibiotic links CSV")
-    sp.add_argument("--group", required=True, help="sheet or organism subgroup, e.g. Enterobacterales")
+    sp.add_argument("--group", action="append", required=True,
+                    help="sheet or organism subgroup; repeat for names a sheet had in other versions, "
+                         "e.g. --group Enterobacterales --group Enterobacteriaceae")
     sp.add_argument("--table", action="append", required=True, help="EUCAST table (repeatable)")
     sp.add_argument("-o", "--output", help="write CSV here instead of stdout")
     sp.set_defaults(func=_cmd_reinterpret)

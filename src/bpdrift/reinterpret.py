@@ -68,7 +68,7 @@ def reinterpret(
     records: Iterable[ASTRecord],
     tables: dict[str, EucastTable],
     links: Links,
-    group: str,
+    group: str | Iterable[str],
 ) -> tuple[list[Reinterpretation], Counter]:
     """Interpret every linked record under every table.
 
