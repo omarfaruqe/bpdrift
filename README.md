@@ -116,6 +116,27 @@ python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G
 python analysis/figures.py results -o results/figures
 ```
 
+Replication cohort (NCBI BioSample antibiograms, BioSamples already in BV-BRC left out):
+
+```bash
+bash scripts/download_ncbi_ast.sh
+python analysis/ncbi_ast.py data/ncbi/ast \
+    --exclude-bvbrc data/bvbrc/kpneumoniae_amr_all.csv data/bvbrc/kpneumoniae_genomes.csv \
+    -o data/ncbi/ncbi_ast_bvbrc_format.csv --genomes-out data/ncbi/ncbi_ast_genomes.csv \
+    --summary results/ncbi/cohort.txt
+bpdrift reinterpret --bvbrc data/ncbi/ncbi_ast_bvbrc_format.csv \
+    --links mappings/bvbrc_to_eucast_enterobacterales.csv \
+    --group Enterobacterales --group Enterobacteriaceae $T -o data/derived/ncbi_reinterpreted.csv
+R=data/derived/ncbi_reinterpreted.csv
+python analysis/flip_rates.py $R -o results/ncbi/flip_rates.csv
+python analysis/robustness.py $R -o results/ncbi/robustness.csv --transitions results/ncbi/transitions.csv
+python analysis/as_reported.py $R -o results/ncbi/as_reported.csv
+G2="${G/kpneumoniae_genomes.csv/ncbi_ast_genomes.csv}"; G2="${G2/data\/bvbrc\//data/ncbi/}"
+python analysis/genotype_errors.py $R $G2 --matched -o results/ncbi/genotype_errors.csv --summary results/ncbi/genotype_join.txt
+python analysis/genotype_errors.py $R $G2 -o results/ncbi/genotype_errors_unmatched.csv \
+    --summary results/ncbi/genotype_join_unmatched.txt
+```
+
 ## Status
 
 Version 0.1.0. A research tool, not for clinical use: it reports what a

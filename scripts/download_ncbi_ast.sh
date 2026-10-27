@@ -26,16 +26,22 @@ if [ -z "$COUNT" ] || [ "$COUNT" = 0 ]; then
     echo "no BioSamples matched; esearch said:" >&2; printf '%s\n' "$SEARCH" >&2; exit 1
 fi
 printf 'query\t%s\ndate\t%s\ncount\t%s\n' "$TERM" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$COUNT" > "$OUT/query.txt"
-echo "BioSamples with an antibiogram: $COUNT"
+echo "esearch count: $COUNT (the stored result set can be smaller; see 'fetched')"
 
 for (( start=0; start<COUNT; start+=BATCH )); do
     f=$(printf '%s/biosample_%06d.xml' "$OUT" "$start")
     curl -sS --retry 5 --retry-delay 3 -o "$f" \
         "$EU/efetch.fcgi?db=biosample&query_key=$QKEY&WebEnv=$WEBENV&retstart=$start&retmax=$BATCH&retmode=xml$KEY"
+    # esearch's Count can exceed the IDs it stores in the history; past the end,
+    # efetch answers OUT OF RANGE, which marks the end of the result set.
+    if grep -q 'OUT OF RANGE' "$f"; then rm -f "$f"; break; fi
     tail -c 200 "$f" | grep -q '</BioSampleSet>' || { echo "incomplete batch $f; rerun the script" >&2; exit 1; }
     printf '\r%d / %d' "$(( start + BATCH < COUNT ? start + BATCH : COUNT ))" "$COUNT"
     sleep "$PAUSE"
 done
 echo
+FETCHED=$(cat "$OUT"/biosample_*.xml | grep -o '<BioSample ' | wc -l | tr -d ' ')
+printf 'fetched\t%s\n' "$FETCHED" >> "$OUT/query.txt"
+echo "BioSamples fetched: $FETCHED"
 ls "$OUT"/biosample_*.xml | wc -l | xargs echo "batches:"
 shasum -a 256 "$OUT"/biosample_*.xml | shasum -a 256 | cut -c1-16 | xargs echo "checksum of all batches:"

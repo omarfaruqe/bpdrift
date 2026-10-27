@@ -1,0 +1,7 @@
+BioSamples downloaded: 2518
+antibiogram rows: 33728
+BioSamples left out, already with AST in BV-BRC: 500
+BioSamples kept: 2018
+rows kept: 26355 (MIC in mg/L: 24959; BioSamples with an MIC: 1688)
+testing standard of kept MIC rows: CLSI 14164, EUCAST 6847, not stated 3947, NARMS 1
+host of kept BioSamples: Homo sapiens 1280, not stated 509, Sus scrofa domesticus 111, Canis lupus familiaris 93, Homo sapiens sapiens 10, Swine 8
