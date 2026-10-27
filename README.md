@@ -61,9 +61,59 @@ naming a row that does not exist is an error. An optional fifth column,
 `note`, records why two rows correspond; lines starting with `#` are
 comments.
 
+## Re-interpreting public AST data
+
+`bpdrift reinterpret` reads a BV-BRC `genome_amr` CSV export, links each
+antibiotic name to the EUCAST row used in every table version through a
+reviewed CSV (`mappings/bvbrc_to_eucast_enterobacterales.csv`), and writes
+one row per MIC per version. Records it cannot use are counted, never
+dropped silently.
+
+```bash
+bpdrift reinterpret --bvbrc data/bvbrc/kpneumoniae_amr_all.csv \
+    --links mappings/bvbrc_to_eucast_enterobacterales.csv \
+    --group Enterobacterales --group Enterobacteriaceae \
+    --table data/breakpoints/v_8.1_Breakpoint_Tables.xlsx \
+    --table data/breakpoints/v_16.1_Breakpoint_Tables.xlsx \
+    -o data/derived/kpneumoniae_reinterpreted.csv
+```
+
+## Genotype predictor error rates
+
+`bpdrift.genotype` scores a fixed AMRFinderPlus-based predictor against
+labels from each breakpoint version (very major and major error rates with
+Wilson 95% intervals). The drug-class mapping and the excluded intrinsic
+genes are reviewable CSVs in `mappings/`.
+
+## Reproducing the K. pneumoniae analysis
+
+Inputs are downloaded, not committed: EUCAST tables by hand into
+`data/breakpoints/`, the rest with the two download steps below.
+
+```bash
+bash scripts/download_bvbrc_ast.sh    # BV-BRC laboratory AST records, K. pneumoniae
+bash scripts/download_h3_inputs.sh    # NCBI genotypes, AMRFinderPlus catalogues, BV-BRC accessions
+
+B=data/breakpoints; T=""; for v in 8.1 9.0 10.0 13.1 14.0 15.0 16.1; do T="$T --table $B/v_${v}_Breakpoint_Tables.xlsx"; done
+bpdrift reinterpret --bvbrc data/bvbrc/kpneumoniae_amr_all.csv \
+    --links mappings/bvbrc_to_eucast_enterobacterales.csv \
+    --group Enterobacterales --group Enterobacteriaceae $T \
+    -o data/derived/kpneumoniae_reinterpreted.csv
+python analysis/flip_rates.py data/derived/kpneumoniae_reinterpreted.csv -o results/flip_rates.csv
+python analysis/as_reported.py data/derived/kpneumoniae_reinterpreted.csv -o results/as_reported.csv
+python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv \
+    --genomes data/bvbrc/kpneumoniae_genomes.csv --pd-metadata data/ncbi/PDG*.metadata.tsv \
+    --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv \
+    --map mappings/amrfinder_subclass_to_antibiotic.csv \
+    --exclude mappings/amrfinder_excluded_families.csv \
+    -o results/genotype_errors.csv --summary results/genotype_join.txt
+python analysis/figures.py results -o results/figures
+```
+
 ## Status
 
-Early development (v0.0.x). Not for clinical use.
+Version 0.1.0. A research tool, not for clinical use: it reports what a
+breakpoint table says about an MIC, not what to treat with.
 
 ## Citation
 
