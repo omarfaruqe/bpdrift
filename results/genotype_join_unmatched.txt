@@ -21,5 +21,5 @@ element calls ignored (by method or excluded family):
     oqxR: 93
     acrR: 70
 element symbols not in the AMRFinderPlus catalogue: 2 (2 distinct)
-    ramR_Y59_M133del: 1
     ramR_V97Rfs: 1
+    ramR_Y59_M133del: 1
