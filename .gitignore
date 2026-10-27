@@ -19,3 +19,6 @@ data/derived/
 
 # macOS
 .DS_Store
+
+# diff outputs repeat breakpoint values: keep out of git
+diff_*.csv
