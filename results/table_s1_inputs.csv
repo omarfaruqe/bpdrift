@@ -12,3 +12,10 @@ NCBI Pathogen Detection / AMRFinderPlus,AMRProt-mutation.tsv,,204779,2026-10-27,
 NCBI Pathogen Detection / AMRFinderPlus,PDG000000012.2563.metadata.tsv,PDG000000012.2563,193886122,2026-10-27,e35b7e5c7e5232bd3204e582592ac77a0ab3b9718d45767635baa6c5e09635ed
 NCBI Pathogen Detection / AMRFinderPlus,ReferenceGeneCatalog.txt,,2330416,2026-10-27,fa41ade01712841e639c91163243bace1c34755b927e69e0c8678540268a7fd4
 NCBI Pathogen Detection / AMRFinderPlus,amrfinder_db_version.txt,database 2026-08-07.1,13,2026-10-27,43ad0274317a2cbf80e01626e3ae6084a02f471be2f870d57fdbe2d35761911a
+NCBI BioSample antibiograms (E-utilities),biosample_000000.xml,,4949775,2026-10-27,95ab433bcfdc09638a728e602964d611ed71b1c7679be84728eb5661069efd30
+NCBI BioSample antibiograms (E-utilities),biosample_000500.xml,,3583714,2026-10-27,4069c1a9820e306906f35a2387bebdd86ef6255ea6113b0e7dafce5f041dde6b
+NCBI BioSample antibiograms (E-utilities),biosample_001000.xml,,2761088,2026-10-27,8ef1d7f3e07b279ca193caf0e8cfd07ddafe184f204b1cb0da806329311ba577
+NCBI BioSample antibiograms (E-utilities),biosample_001500.xml,,2966619,2026-10-27,913e58ee995ce3755051dab28898228e56d6124aff07cedab8d9134db75ed8a3
+NCBI BioSample antibiograms (E-utilities),biosample_002000.xml,,4703094,2026-10-27,83ac7db3e058e2e8e702673a7669801888793adfc13cf45ca339e4653aea2e3a
+NCBI BioSample antibiograms (E-utilities),biosample_002500.xml,,97971,2026-10-27,a0fc123fa65e09c531539dd44317e073f30c8e050032269ce1f55531f5da0944
+NCBI BioSample antibiograms (E-utilities),query.txt,,99,2026-10-27,144e244aa6fde00a42dc48034940376a62afba9a96e7da78e89ca6634d074bb1
