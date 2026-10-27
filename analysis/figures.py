@@ -8,6 +8,8 @@ Figure 1  label flip rate between EUCAST v10.0 and v16.1, per antibiotic,
 Figure 2  agreement of BV-BRC's reported calls with the re-interpreted
           labels (resistant vs not resistant) under each EUCAST version,
           by the testing standard the record states.
+Figure 3  very major and major error rates of the genotype predictor under
+          each EUCAST version (drawn when results/genotype_errors.csv exists).
 
 Colour: categorical slots in fixed order from a palette validated for
 colour-vision deficiency; identity is also carried by marker shape and a
@@ -142,6 +144,65 @@ def figure_2(agree, out: Path):
     plt.close(fig)
 
 
+def figure_3(errors, out: Path, min_compared=200, min_shift=2.0):
+    """Very major and major error rates of the genotype predictor across versions."""
+    versions = sorted({r["eucast_version"] for r in errors}, key=_vkey)
+    idx = {(r["antibiotic"], r["eucast_version"]): r for r in errors}
+    shifts = []
+    for ab in {r["antibiotic"] for r in errors} - {"ALL"}:
+        rows = [idx.get((ab, v)) for v in (versions[0], versions[-1])]
+        if not all(rows) or int(rows[1]["compared"]) < min_compared:
+            continue
+        d = max(abs(100 * (float(rows[1][k]) - float(rows[0][k]))) for k in ("vme_rate", "me_rate")
+                if rows[0][k] != "nan" and rows[1][k] != "nan")
+        if d >= min_shift:
+            shifts.append((d, ab))
+    drugs = [ab for _, ab in sorted(shifts, reverse=True)]
+    if not drugs:
+        return
+    cols = min(4, len(drugs))
+    nrows = -(-len(drugs) // cols)
+    fig, axes = plt.subplots(nrows, cols, figsize=(7.0, 2.25 * nrows + 0.9), sharex=True, squeeze=False)
+    x = range(len(versions))
+    for i, ab in enumerate(drugs):
+        ax = axes[i // cols][i % cols]
+        for k, (key, label, marker) in enumerate([("vme", "Very major errors", "o"), ("me", "Major errors", "D")]):
+            pts = [(j, idx.get((ab, v))) for j, v in enumerate(versions)]
+            pts = [(j, r) for j, r in pts if r and r[f"{key}_rate"] != "nan"]
+            xs = [j for j, _ in pts]
+            p = [100 * float(r[f"{key}_rate"]) for _, r in pts]
+            lo = [100 * float(r[f"{key}_lo"]) for _, r in pts]
+            hi = [100 * float(r[f"{key}_hi"]) for _, r in pts]
+            ax.vlines(xs, lo, hi, color=SERIES[k], lw=1.5, alpha=0.6, zorder=2)
+            ax.plot(xs, p, color=SERIES[k], lw=2, marker=marker, ms=4.5, mec="white", mew=0.8,
+                    label=label if i == 0 else None, zorder=3)
+            ax.annotate(f"{p[-1]:.0f}%", (xs[-1], p[-1]), xytext=(4, 0), textcoords="offset points",
+                        va="center", fontsize=7, color=INK)
+        short = {"trimethoprim/sulfamethoxazole": "co-trimoxazole"}.get(ab, _pretty(ab))
+        ax.set_title(short, fontsize=8.5, loc="left", color=INK)
+        ax.set_ylim(bottom=0)
+        ax.yaxis.grid(True, color=GRID, lw=0.8)
+        ax.set_axisbelow(True)
+        ax.set_xticks(list(x), [f"v{v}" for v in versions], rotation=90, fontsize=6.5)
+        ax.tick_params(axis="y", labelsize=7)
+        ax.set_xlim(-0.4, len(versions) - 0.2)
+    for j in range(len(drugs), nrows * cols):
+        axes[j // cols][j % cols].set_visible(False)
+    for row in axes:
+        row[0].set_ylabel("Error rate (%)", fontsize=8)
+    fig.legend(loc="upper right", frameon=False, fontsize=8, ncol=2, bbox_to_anchor=(0.995, 0.965))
+    fig.text(0.01, 0.995, "The same genotype predictor scores differently under each breakpoint version",
+             fontsize=10, fontweight="bold", va="top")
+    fig.text(0.01, 0.005, "AMRFinderPlus calls (NCBI Pathogen Detection) vs re-interpreted MICs; K. pneumoniae, "
+             "main analysis.\nVery major = missed resistance; major = false resistance; bars are Wilson 95% "
+             "intervals.\nAntibiotics whose error rate moves by at least 2 percentage points; y-axis scales "
+             "differ by panel.", fontsize=6.5, color=INK_2)
+    fig.tight_layout(rect=(0, 0.07, 1, 0.92))
+    for ext in ("png", "svg"):
+        fig.savefig(out / f"figure3_genotype_errors.{ext}", dpi=300)
+    plt.close(fig)
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("results", help="folder holding flip_rates.csv and as_reported.csv")
@@ -151,6 +212,9 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     figure_1(_read(Path(args.results) / "flip_rates.csv"), out)
     figure_2(_read(Path(args.results) / "as_reported.csv"), out)
+    genotype = Path(args.results) / "genotype_errors.csv"
+    if genotype.exists():
+        figure_3(_read(genotype), out)
     print(f"wrote figures to {out}")
     return 0
 
