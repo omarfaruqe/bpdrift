@@ -3,29 +3,36 @@
 #
 #   bash scripts/reproduce.sh            # needs the inputs listed in results/table_s1_inputs.csv
 #
-# Steps: test suite; re-interpretation of both cohorts under every EUCAST version;
-# every analysis script; figures. Then compares results/ with the committed files:
-# exit 0 and "REPRODUCED" when every file is byte-identical, otherwise lists the
-# files that differ and exits 1. Inputs are not downloaded here (see README).
+# Steps: verify every input against the committed manifest (Table S1: path, size,
+# SHA-256; no filesystem dates); test suite; re-interpretation of both cohorts
+# under every EUCAST version; every analysis script; figures. Then compares
+# results/ with the committed files: exit 0 and "REPRODUCED" when every file is
+# byte-identical, otherwise lists the files that differ and exits 1. Exit 2 when
+# the inputs do not match the manifest. Inputs are not downloaded here (see README).
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PYTHON:-python}
 export PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1
 
-need() { for f in "$@"; do [ -e "$f" ] || { echo "missing input: $f (see README, Reproducing)" >&2; exit 2; }; done; }
-B=data/breakpoints
-VERSIONS="8.1 9.0 10.0 13.1 14.0 15.0 16.1"
-T=""; for v in $VERSIONS; do need "$B/v_${v}_Breakpoint_Tables.xlsx"; T="$T --table $B/v_${v}_Breakpoint_Tables.xlsx"; done
-PD=$(ls data/ncbi/PDG*.metadata.tsv 2>/dev/null | head -1)
-need data/bvbrc/kpneumoniae_amr_all.csv data/bvbrc/kpneumoniae_genomes.csv "$PD" \
-     data/ncbi/ReferenceGeneCatalog.txt data/ncbi/AMRProt-mutation.tsv data/ncbi/ast
-
+MANIFEST=results/table_s1_inputs.csv
 if [ -n "$(git status --porcelain -- results/)" ]; then
     echo "results/ has uncommitted changes; commit or discard them first" >&2; exit 2
 fi
 
 step() { printf '\n== %s\n' "$*"; }
+step "inputs against $MANIFEST"
+$PY analysis/inputs_manifest.py data --check "$MANIFEST" || exit 2
+
+# every input path below comes from the verified manifest
+listed() { awk -F, -v pat="$1" 'NR > 1 && $2 ~ pat {print $2}' "$MANIFEST"; }
+by_version() { $PY -c 'import re, sys
+key = lambda p: [int(x) for x in re.search(r"v_([0-9.]+)_", p).group(1).split(".")]
+print("\n".join(sorted(sys.stdin.read().split(), key=key)))'; }
+T=""; for f in $(listed '^data/breakpoints/.*[.]xlsx$' | by_version); do T="$T --table $f"; done
+PD=$(listed '^data/ncbi/PDG.*[.]metadata[.]tsv$')
+[ "$(printf '%s\n' "$PD" | grep -c .)" = 1 ] || { echo "manifest must list exactly one PDG metadata file" >&2; exit 2; }
+
 step "tests"
 $PY -m pytest -q -p no:cacheprovider
 
@@ -33,9 +40,6 @@ LINKS=mappings/bvbrc_to_eucast_enterobacterales.csv
 GRP="--group Enterobacterales --group Enterobacteriaceae"
 GENO="--pd-metadata $PD --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv
       --map mappings/amrfinder_subclass_to_antibiotic.csv --exclude mappings/amrfinder_excluded_families.csv"
-
-step "inputs manifest (Table S1)"
-$PY analysis/inputs_manifest.py data -o results/table_s1_inputs.csv
 
 step "BV-BRC cohort"
 R=data/derived/kpneumoniae_reinterpreted.csv

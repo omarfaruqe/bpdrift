@@ -1,17 +1,28 @@
 """Supplementary Table S1: every input file with its version and checksum.
 
-    python analysis/inputs_manifest.py data -o results/table_s1_inputs.csv
+    python analysis/inputs_manifest.py data -o results/table_s1_inputs.csv     # write
+    python analysis/inputs_manifest.py data --check results/table_s1_inputs.csv  # verify
 
 Lists the EUCAST tables (version read from each workbook), the BV-BRC exports,
-the NCBI files and the NCBI BioSample antibiogram batches under data/, with size and SHA-256, so a reader can check
-that a re-run uses byte-identical inputs. File contents are not copied.
+the NCBI files and the NCBI BioSample antibiogram batches under data/, with
+path, size and SHA-256. File contents are not copied.
+
+The table records only what identifies the bytes (path, size, checksum) and a
+version read from the content, never filesystem dates, so identical inputs give
+an identical table wherever and whenever they were downloaded. Retrieval dates
+are stated in the paper's Methods.
+
+--check verifies the inputs present under data/ against a committed table:
+every listed file must exist with the same size and checksum, and no unlisted
+file may sit in a listed folder (it could change what a glob in the pipeline
+picks up). Exit status 0 when everything matches, 1 otherwise, with each
+problem listed.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import datetime as dt
 from pathlib import Path
 
 from bpdrift.eucast import read_eucast_xlsx
@@ -23,6 +34,7 @@ SOURCES = {
     "ncbi": "NCBI Pathogen Detection / AMRFinderPlus",
     "ncbi/ast": "NCBI BioSample antibiograms (E-utilities)",
 }
+COLUMNS = ["source", "path", "version", "bytes", "sha256"]
 
 
 def describe(path: Path, folder: str) -> tuple[str, str]:
@@ -35,27 +47,69 @@ def describe(path: Path, folder: str) -> tuple[str, str]:
     return SOURCES.get(folder, folder), ""
 
 
+def inputs(root: Path) -> list[Path]:
+    """Input files directly inside each source folder (subfolders are their own sources)."""
+    out = []
+    for folder in SOURCES:
+        for f in sorted((root / folder).glob("*")):
+            if f.is_file() and not f.name.startswith("."):
+                out.append(f)
+    return out
+
+
+def rel(path: Path, root: Path) -> str:
+    return (Path(root.name) / path.relative_to(root)).as_posix()
+
+
+def write(root: Path, output: str) -> int:
+    rows = []
+    for f in inputs(root):
+        folder = f.parent.relative_to(root).as_posix()
+        source, version = describe(f, folder)
+        rows.append([source, rel(f, root), version, f.stat().st_size, sha256_of(f)])
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    with open(output, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh, lineterminator="\n")
+        w.writerow(COLUMNS)
+        w.writerows(rows)
+    print(f"wrote {output}: {len(rows)} files")
+    return 0
+
+
+def check(root: Path, manifest: str) -> int:
+    with open(manifest, newline="", encoding="utf-8") as fh:
+        listed = {r["path"]: r for r in csv.DictReader(fh)}
+    problems = []
+    base = root.parent
+    for path, r in listed.items():
+        f = base / path
+        if not f.is_file():
+            problems.append(f"missing: {path}")
+        elif f.stat().st_size != int(r["bytes"]):
+            problems.append(f"size differs: {path} ({f.stat().st_size} bytes, expected {r['bytes']})")
+        elif sha256_of(f) != r["sha256"]:
+            problems.append(f"checksum differs: {path}")
+    for f in inputs(root):
+        if rel(f, root) not in listed:
+            problems.append(f"not in the manifest: {rel(f, root)}")
+    if problems:
+        print(f"inputs do NOT match {manifest}:")
+        for p in problems:
+            print(f"    {p}")
+        return 1
+    print(f"inputs match {manifest}: {len(listed)} files, sizes and SHA-256 identical")
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("data", help="the data/ folder")
-    p.add_argument("-o", "--output", required=True)
+    g = p.add_mutually_exclusive_group(required=True)
+    g.add_argument("-o", "--output", help="write the manifest here")
+    g.add_argument("--check", metavar="MANIFEST", help="verify data/ against this manifest")
     a = p.parse_args(argv)
     root = Path(a.data)
-    rows = []
-    for folder in SOURCES:
-        for f in sorted((root / folder).glob("*")):
-            if not f.is_file() or f.name.startswith("."):
-                continue
-            source, version = describe(f, folder)
-            modified = dt.datetime.fromtimestamp(f.stat().st_mtime).date().isoformat()
-            rows.append([source, f.name, version, f.stat().st_size, modified, sha256_of(f)])
-    Path(a.output).parent.mkdir(parents=True, exist_ok=True)
-    with open(a.output, "w", newline="", encoding="utf-8") as fh:
-        w = csv.writer(fh, lineterminator="\n")
-        w.writerow(["source", "file", "version", "bytes", "file_date", "sha256"])
-        w.writerows(rows)
-    print(f"wrote {a.output}: {len(rows)} files")
-    return 0
+    return write(root, a.output) if a.output else check(root, a.check)
 
 
 if __name__ == "__main__":

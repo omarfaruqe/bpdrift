@@ -1,21 +1,21 @@
-source,file,version,bytes,file_date,sha256
-EUCAST clinical breakpoint table,v_10.0_Breakpoint_Tables.xlsx,v10.0,3655584,2026-10-26,a1b6f52206534af591caaa176962afb4b33d59585ec1a73c9c2ba5dfd52263b8
-EUCAST clinical breakpoint table,v_13.1_Breakpoint_Tables.xlsx,v13.1,2559213,2026-10-26,fbb931367757a00db1294c09172a186c94a6c2c2c99b666bb6fe3d567b6983e8
-EUCAST clinical breakpoint table,v_14.0_Breakpoint_Tables.xlsx,v14.0,2575688,2026-10-27,287be4df279904b02215ac2080ac54c1068e84a501bcf0526e27effc8d848b24
-EUCAST clinical breakpoint table,v_15.0_Breakpoint_Tables.xlsx,v15.0,2598334,2026-10-26,c540088890d8df1e29fd223d526db6b2c477df5f335413f2db31a1f0dd3f86aa
-EUCAST clinical breakpoint table,v_16.1_Breakpoint_Tables.xlsx,v16.1,2679948,2026-10-26,ee5709eb5b7c9beb1c9ba8182a4e7032e71963aaca30e618b9f76dc53f6bab73
-EUCAST clinical breakpoint table,v_8.1_Breakpoint_Tables.xlsx,v8.1,2088113,2026-10-27,59e2d778626d5d2e0c3fc3c636c8107b977b3d60f4d34855b841f014c602fcd2
-EUCAST clinical breakpoint table,v_9.0_Breakpoint_Tables.xlsx,v9.0,2775130,2026-10-27,b474275737c3572d04d1a70e2725912f7176a8e1a7034803d97e83ad4c87402e
-BV-BRC export,kpneumoniae_amr_all.csv,,14709075,2026-10-26,5aa675c1e332dba301bdeef77eb69a6a82ecc745c503ee6a7b716660004aca27
-BV-BRC export,kpneumoniae_genomes.csv,,2926027,2026-10-27,41887ed37591aa9d037c5307fc730c19e9fb074ead157460ab393c0c3f88fe56
-NCBI Pathogen Detection / AMRFinderPlus,AMRProt-mutation.tsv,,204779,2026-10-27,b6f441972d1753a0cc9b1a4d317950eb085e3a52bea8b6d82e0ff53b15280f7b
-NCBI Pathogen Detection / AMRFinderPlus,PDG000000012.2563.metadata.tsv,PDG000000012.2563,193886122,2026-10-27,e35b7e5c7e5232bd3204e582592ac77a0ab3b9718d45767635baa6c5e09635ed
-NCBI Pathogen Detection / AMRFinderPlus,ReferenceGeneCatalog.txt,,2330416,2026-10-27,fa41ade01712841e639c91163243bace1c34755b927e69e0c8678540268a7fd4
-NCBI Pathogen Detection / AMRFinderPlus,amrfinder_db_version.txt,database 2026-08-07.1,13,2026-10-27,43ad0274317a2cbf80e01626e3ae6084a02f471be2f870d57fdbe2d35761911a
-NCBI BioSample antibiograms (E-utilities),biosample_000000.xml,,4949775,2026-10-27,95ab433bcfdc09638a728e602964d611ed71b1c7679be84728eb5661069efd30
-NCBI BioSample antibiograms (E-utilities),biosample_000500.xml,,3583714,2026-10-27,4069c1a9820e306906f35a2387bebdd86ef6255ea6113b0e7dafce5f041dde6b
-NCBI BioSample antibiograms (E-utilities),biosample_001000.xml,,2761088,2026-10-27,8ef1d7f3e07b279ca193caf0e8cfd07ddafe184f204b1cb0da806329311ba577
-NCBI BioSample antibiograms (E-utilities),biosample_001500.xml,,2966619,2026-10-27,913e58ee995ce3755051dab28898228e56d6124aff07cedab8d9134db75ed8a3
-NCBI BioSample antibiograms (E-utilities),biosample_002000.xml,,4703094,2026-10-27,83ac7db3e058e2e8e702673a7669801888793adfc13cf45ca339e4653aea2e3a
-NCBI BioSample antibiograms (E-utilities),biosample_002500.xml,,97971,2026-10-27,a0fc123fa65e09c531539dd44317e073f30c8e050032269ce1f55531f5da0944
-NCBI BioSample antibiograms (E-utilities),query.txt,,99,2026-10-27,144e244aa6fde00a42dc48034940376a62afba9a96e7da78e89ca6634d074bb1
+source,path,version,bytes,sha256
+EUCAST clinical breakpoint table,data/breakpoints/v_10.0_Breakpoint_Tables.xlsx,v10.0,3655584,a1b6f52206534af591caaa176962afb4b33d59585ec1a73c9c2ba5dfd52263b8
+EUCAST clinical breakpoint table,data/breakpoints/v_13.1_Breakpoint_Tables.xlsx,v13.1,2559213,fbb931367757a00db1294c09172a186c94a6c2c2c99b666bb6fe3d567b6983e8
+EUCAST clinical breakpoint table,data/breakpoints/v_14.0_Breakpoint_Tables.xlsx,v14.0,2575688,287be4df279904b02215ac2080ac54c1068e84a501bcf0526e27effc8d848b24
+EUCAST clinical breakpoint table,data/breakpoints/v_15.0_Breakpoint_Tables.xlsx,v15.0,2598334,c540088890d8df1e29fd223d526db6b2c477df5f335413f2db31a1f0dd3f86aa
+EUCAST clinical breakpoint table,data/breakpoints/v_16.1_Breakpoint_Tables.xlsx,v16.1,2679948,ee5709eb5b7c9beb1c9ba8182a4e7032e71963aaca30e618b9f76dc53f6bab73
+EUCAST clinical breakpoint table,data/breakpoints/v_8.1_Breakpoint_Tables.xlsx,v8.1,2088113,59e2d778626d5d2e0c3fc3c636c8107b977b3d60f4d34855b841f014c602fcd2
+EUCAST clinical breakpoint table,data/breakpoints/v_9.0_Breakpoint_Tables.xlsx,v9.0,2775130,b474275737c3572d04d1a70e2725912f7176a8e1a7034803d97e83ad4c87402e
+BV-BRC export,data/bvbrc/kpneumoniae_amr_all.csv,,14709075,5aa675c1e332dba301bdeef77eb69a6a82ecc745c503ee6a7b716660004aca27
+BV-BRC export,data/bvbrc/kpneumoniae_genomes.csv,,2926027,41887ed37591aa9d037c5307fc730c19e9fb074ead157460ab393c0c3f88fe56
+NCBI Pathogen Detection / AMRFinderPlus,data/ncbi/AMRProt-mutation.tsv,,204779,b6f441972d1753a0cc9b1a4d317950eb085e3a52bea8b6d82e0ff53b15280f7b
+NCBI Pathogen Detection / AMRFinderPlus,data/ncbi/PDG000000012.2563.metadata.tsv,PDG000000012.2563,193886122,e35b7e5c7e5232bd3204e582592ac77a0ab3b9718d45767635baa6c5e09635ed
+NCBI Pathogen Detection / AMRFinderPlus,data/ncbi/ReferenceGeneCatalog.txt,,2330416,fa41ade01712841e639c91163243bace1c34755b927e69e0c8678540268a7fd4
+NCBI Pathogen Detection / AMRFinderPlus,data/ncbi/amrfinder_db_version.txt,database 2026-08-07.1,13,43ad0274317a2cbf80e01626e3ae6084a02f471be2f870d57fdbe2d35761911a
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_000000.xml,,4949775,95ab433bcfdc09638a728e602964d611ed71b1c7679be84728eb5661069efd30
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_000500.xml,,3583714,4069c1a9820e306906f35a2387bebdd86ef6255ea6113b0e7dafce5f041dde6b
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_001000.xml,,2761088,8ef1d7f3e07b279ca193caf0e8cfd07ddafe184f204b1cb0da806329311ba577
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_001500.xml,,2966619,913e58ee995ce3755051dab28898228e56d6124aff07cedab8d9134db75ed8a3
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_002000.xml,,4703094,83ac7db3e058e2e8e702673a7669801888793adfc13cf45ca339e4653aea2e3a
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/biosample_002500.xml,,97971,a0fc123fa65e09c531539dd44317e073f30c8e050032269ce1f55531f5da0944
+NCBI BioSample antibiograms (E-utilities),data/ncbi/ast/query.txt,,99,144e244aa6fde00a42dc48034940376a62afba9a96e7da78e89ca6634d074bb1
