@@ -1,0 +1,18 @@
+# Gene families and mutated genes the K. pneumoniae genotype predictor ignores.
+# DRAFT, pending review. Intrinsic chromosomal genes carried by essentially every
+# K. pneumoniae, and regulator or porin mutations with low or uncertain penetrance.
+# Chromosomal SHV/LEN/OKP beta-lactamases are NOT excluded: they correctly predict
+# the intrinsic ampicillin resistance.
+family,reason
+oqxA,intrinsic chromosomal efflux pump
+oqxB,intrinsic chromosomal efflux pump
+oqxR,regulator of oqxAB; low-level effect
+fosA,intrinsic chromosomal fosfomycin resistance gene
+emrD,intrinsic efflux (plus scope)
+kdeA,intrinsic efflux (plus scope)
+ramR,regulator mutation; low-level multidrug effect
+acrR,regulator mutation; low-level multidrug effect
+marR,regulator mutation; low-level multidrug effect
+ompK35,porin mutation; contributes to but does not confer carbapenem resistance alone
+ompK36,porin mutation; contributes to but does not confer carbapenem resistance alone
+ompK37,porin mutation; contributes to but does not confer carbapenem resistance alone

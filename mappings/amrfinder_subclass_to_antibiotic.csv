@@ -1,0 +1,53 @@
+# AMRFinderPlus subclass token -> antibiotic predicted resistant (BV-BRC antibiotic names).
+# DRAFT, pending review. Used by the genotype arm (H3) as a fixed, deliberately simple
+# predictor: an isolate is predicted resistant when any element's subclass token maps here.
+# Compound subclasses (e.g. AMIKACIN/KANAMYCIN/TOBRAMYCIN) are split on "/".
+subclass_token,antibiotic,note
+CARBAPENEM,imipenem,carbapenemase
+CARBAPENEM,meropenem,carbapenemase
+CARBAPENEM,ertapenem,carbapenemase
+CARBAPENEM,doripenem,carbapenemase
+CARBAPENEM,cefotaxime,carbapenemases also hydrolyse cephalosporins
+CARBAPENEM,ceftriaxone,carbapenemases also hydrolyse cephalosporins
+CARBAPENEM,ceftazidime,carbapenemases also hydrolyse cephalosporins
+CARBAPENEM,cefepime,carbapenemases also hydrolyse cephalosporins
+CARBAPENEM,cefuroxime,carbapenemases also hydrolyse cephalosporins
+CARBAPENEM,ampicillin,carbapenemases also hydrolyse penicillins
+CARBAPENEM,amoxicillin,carbapenemases also hydrolyse penicillins
+CARBAPENEM,piperacillin,carbapenemases also hydrolyse penicillins
+CARBAPENEM,piperacillin/tazobactam,inhibitor does not protect against carbapenemases
+CARBAPENEM,amoxicillin/clavulanic acid,inhibitor does not protect against carbapenemases
+CARBAPENEM,ampicillin/sulbactam,inhibitor does not protect against carbapenemases
+CARBAPENEM,ticarcillin/clavulanic acid,inhibitor does not protect against carbapenemases
+CEPHALOSPORIN,cefotaxime,ESBL or AmpC
+CEPHALOSPORIN,ceftriaxone,ESBL or AmpC
+CEPHALOSPORIN,ceftazidime,ESBL or AmpC
+CEPHALOSPORIN,cefepime,ESBL; AmpC alone usually spares cefepime (known overcall)
+CEPHALOSPORIN,cefuroxime,ESBL or AmpC
+CEPHALOSPORIN,aztreonam,ESBL
+CEPHALOSPORIN,ampicillin,extended-spectrum enzymes also hydrolyse penicillins
+CEPHALOSPORIN,amoxicillin,extended-spectrum enzymes also hydrolyse penicillins
+CEPHALOSPORIN,piperacillin,extended-spectrum enzymes also hydrolyse penicillins
+BETA-LACTAM,ampicillin,penicillinase (includes chromosomal SHV/LEN/OKP of K. pneumoniae)
+BETA-LACTAM,amoxicillin,penicillinase
+BETA-LACTAM,piperacillin,penicillinase
+GENTAMICIN,gentamicin,
+TOBRAMYCIN,tobramycin,
+AMIKACIN,amikacin,
+QUINOLONE,ciprofloxacin,acquired genes or QRDR mutations
+QUINOLONE,levofloxacin,acquired genes or QRDR mutations
+QUINOLONE,moxifloxacin,acquired genes or QRDR mutations
+TRIMETHOPRIM,trimethoprim,dfr genes
+TRIMETHOPRIM,trimethoprim/sulfamethoxazole,dfr genes; sul genes alone are not taken to predict resistance to the combination
+COLISTIN,colistin,mcr genes or chromosomal mutations
+FOSFOMYCIN,fosfomycin,
+CHLORAMPHENICOL,chloramphenicol,
+PHENICOL,chloramphenicol,
+AMINOGLYCOSIDE,gentamicin,16S rRNA methyltransferases (rmt) and broad aac(3) variants
+AMINOGLYCOSIDE,tobramycin,16S rRNA methyltransferases
+AMINOGLYCOSIDE,amikacin,16S rRNA methyltransferases
+FLUOROQUINOLONE,ciprofloxacin,
+FLUOROQUINOLONE,levofloxacin,
+FLUOROQUINOLONE,moxifloxacin,
+AZTREONAM,aztreonam,
+AMPICILLIN,ampicillin,
