@@ -169,6 +169,44 @@ def test_unrecognised_value_fails_loudly(tmp_path, bad):
         read_eucast_xlsx(path)
 
 
+def test_blank_spacer_row_under_header_is_skipped(tmp_path):
+    # v8.1 leaves an empty row between "S ≤ / R >" and the first agent
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Testobacteriaceae"
+    ws.cell(1, 9, "EUCAST Clinical Breakpoint Tables v. 8.1")
+    ws.cell(5, 1, "Aminoglycosides")
+    ws.cell(5, 2, "MIC breakpoint (mg/L)")
+    ws.cell(6, 2, "S ≤")
+    ws.cell(6, 3, "R >")
+    ws.cell(8, 1, "Amikacin")
+    ws.cell(8, 2, "8")
+    ws.cell(8, 3, "16")
+    ws.cell(9, 1, "Gentamicin")
+    ws.cell(9, 2, "2")
+    ws.cell(9, 3, "4")
+    path = tmp_path / "spacer.xlsx"
+    wb.save(path)
+    t = read_eucast_xlsx(path)
+    assert [(r.agent, r.s.value, r.r.value) for r in t.rows] == [("Amikacin", 8.0, 16.0), ("Gentamicin", 2.0, 4.0)]
+
+
+def test_header_with_no_rows_fails_loudly(tmp_path):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Testobacteriaceae"
+    ws.cell(1, 9, "EUCAST Clinical Breakpoint Tables v. 8.1")
+    ws.cell(5, 1, "Aminoglycosides")
+    ws.cell(5, 2, "MIC breakpoint (mg/L)")
+    ws.cell(6, 2, "S ≤")
+    ws.cell(6, 3, "R >")
+    ws.cell(12, 1, "Amikacin")  # too far below the header to be this block's data
+    path = tmp_path / "empty_block.xlsx"
+    wb.save(path)
+    with pytest.raises(EucastFormatError, match="no agent rows"):
+        read_eucast_xlsx(path)
+
+
 def test_header_spacing_is_ignored(tmp_path):
     # v8.1 writes the R header as "R>" with no space
     t = read_eucast_xlsx(build(tmp_path / "nospace.xlsx", header_r="R>"))

@@ -180,6 +180,7 @@ def _detect_version(workbook) -> str:
 
 
 SUBGROUP_MIN_SIZE = 12  # subgroup headings are 14 pt bold; notes are 8 pt
+MAX_SPACER_ROWS = 2     # blank rows tolerated between the S/R header and the first agent
 
 
 def _subgroup(ws, hdr_row: int, floor: int) -> str:
@@ -216,6 +217,11 @@ def _read_sheet(ws) -> list[MICRow]:
         drug_class = _split(ws.cell(hdr_row, 1).value)[0].strip()
 
         r = hdr_row + 2
+        # some versions (v8.1) leave a blank spacer row under the S/R header
+        while (r <= ws.max_row and r < hdr_row + 2 + MAX_SPACER_ROWS
+               and not any(_split(ws.cell(r, c).value)[0].strip() for c in (1, 2, 3))):
+            r += 1
+        first = r
         while r <= ws.max_row:
             agent, agent_notes = _split(ws.cell(r, 1).value)
             agent = " ".join(agent.split())
@@ -237,6 +243,10 @@ def _read_sheet(ws) -> list[MICRow]:
                 )
             )
             r += 1
+        if r == first:
+            raise EucastFormatError(
+                f"{ws.title}!A{hdr_row}: MIC header with no agent rows under it"
+            )
         floor = r
     return rows
 
