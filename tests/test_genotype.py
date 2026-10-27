@@ -207,3 +207,10 @@ def test_exclusion_match_must_be_known(tmp_path):
     p.write_text("family,reason,match\nfosA,x,allele\n", encoding="utf-8")
     with pytest.raises(GenotypeError, match="match must be"):
         load_exclusions(p)
+
+
+def test_intermediate_phenotype_counts_as_not_resistant():
+    """EUCAST I is a susceptible category: predicted R with phenotype I is a major error,
+    predicted not R with phenotype I is correct, and I never enters the VME denominator."""
+    e = error_rates([(True, "I"), (False, "I"), (True, "R")])
+    assert (e.phenotype_r, e.phenotype_not_r, e.vme, e.me) == (1, 2, 0, 1)

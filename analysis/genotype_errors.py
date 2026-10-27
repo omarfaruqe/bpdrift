@@ -96,6 +96,8 @@ def main(argv=None) -> int:
     p.add_argument("--exclude", help="CSV of gene families or symbols the predictor ignores")
     p.add_argument("-o", "--output", required=True)
     p.add_argument("--summary", required=True)
+    p.add_argument("--pairs-out", help="also write one row per compared genome-drug-version pair "
+                   "(genome, antibiotic, version, predicted resistant, phenotype) for paired analyses")
     p.add_argument("--matched", action="store_true",
                    help="compare only genome-drug pairs labelled S, I or R under every version")
     a = p.parse_args(argv)
@@ -156,6 +158,15 @@ def main(argv=None) -> int:
         else:
             undecidable[(ab, v)] += 1
             undecidable[("ALL", v)] += 1
+
+    if a.pairs_out:
+        Path(a.pairs_out).parent.mkdir(parents=True, exist_ok=True)
+        with open(a.pairs_out, "w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh, lineterminator="\n")
+            w.writerow(["genome_id", "antibiotic", "eucast_version", "predicted_resistant", "phenotype"])
+            for (g, ab, v), cat in sorted(labels.items()):
+                if g in predictions and ab in targets and cat in ("S", "I", "R"):
+                    w.writerow([g, ab, v, int(ab in predictions[g]), cat])
 
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     with open(a.output, "w", newline="", encoding="utf-8") as fh:
