@@ -30,7 +30,7 @@ step "tests"
 $PY -m pytest -q -p no:cacheprovider
 
 LINKS=mappings/bvbrc_to_eucast_enterobacterales.csv
-GROUPS="--group Enterobacterales --group Enterobacteriaceae"
+GRP="--group Enterobacterales --group Enterobacteriaceae"
 GENO="--pd-metadata $PD --genes data/ncbi/ReferenceGeneCatalog.txt --mutations data/ncbi/AMRProt-mutation.tsv
       --map mappings/amrfinder_subclass_to_antibiotic.csv --exclude mappings/amrfinder_excluded_families.csv"
 
@@ -39,7 +39,7 @@ $PY analysis/inputs_manifest.py data -o results/table_s1_inputs.csv
 
 step "BV-BRC cohort"
 R=data/derived/kpneumoniae_reinterpreted.csv
-$PY -m bpdrift reinterpret --bvbrc data/bvbrc/kpneumoniae_amr_all.csv --links $LINKS $GROUPS $T -o $R
+$PY -m bpdrift reinterpret --bvbrc data/bvbrc/kpneumoniae_amr_all.csv --links $LINKS $GRP $T -o $R
 $PY analysis/flip_rates.py $R -o results/flip_rates.csv
 $PY analysis/as_reported.py $R -o results/as_reported.csv
 $PY analysis/robustness.py $R -o results/robustness.csv --transitions results/transitions.csv
@@ -61,7 +61,7 @@ $PY analysis/ncbi_ast.py data/ncbi/ast \
     -o data/derived/ncbi_ast_bvbrc_format.csv --genomes-out data/derived/ncbi_ast_genomes.csv \
     --summary results/ncbi/cohort.txt
 R=data/derived/ncbi_reinterpreted.csv
-$PY -m bpdrift reinterpret --bvbrc data/derived/ncbi_ast_bvbrc_format.csv --links $LINKS $GROUPS $T -o $R
+$PY -m bpdrift reinterpret --bvbrc data/derived/ncbi_ast_bvbrc_format.csv --links $LINKS $GRP $T -o $R
 $PY analysis/flip_rates.py $R -o results/ncbi/flip_rates.csv
 $PY analysis/as_reported.py $R -o results/ncbi/as_reported.csv
 $PY analysis/robustness.py $R -o results/ncbi/robustness.csv --transitions results/ncbi/transitions.csv
