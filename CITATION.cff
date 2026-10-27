@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use bpdrift, please cite it as below."
+title: "bpdrift: version-pinned interpretation of MIC values under EUCAST breakpoints"
+type: software
+authors:
+  - family-names: Faruqe
+    given-names: Md Omar
+    email: faruqe@ru.ac.bd
+    affiliation: "Department of Computer Science and Engineering, University of Rajshahi"
+version: 0.0.1
+license: MIT
+repository-code: "https://github.com/omarfaruqe/bpdrift"
+keywords:
+  - antimicrobial resistance
+  - MIC
+  - EUCAST
+  - clinical breakpoints
+  - bioinformatics

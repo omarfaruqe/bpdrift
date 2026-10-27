@@ -1,5 +1,7 @@
 # bpdrift
 
+[![tests](https://github.com/omarfaruqe/bpdrift/actions/workflows/tests.yml/badge.svg)](https://github.com/omarfaruqe/bpdrift/actions/workflows/tests.yml)
+
 Interpret minimum inhibitory concentration (MIC) values as S / I / R under a
 specific, pinned version of the EUCAST clinical breakpoint tables, and report
 where two versions disagree.
@@ -13,6 +15,14 @@ where two versions disagree.
   could fall on either side of a breakpoint returns `UNDECIDABLE`, never a
   guess.
 - **Fail loudly on ambiguity.** Unparseable input raises an error.
+
+## Install
+
+```bash
+pip install -e ".[dev]"          # library, CLI and tests
+pip install -e ".[dev,analysis]" # plus matplotlib for the paper figures
+pytest -q
+```
 
 ## Usage
 
@@ -54,6 +64,10 @@ comments.
 ## Status
 
 Early development (v0.0.x). Not for clinical use.
+
+## Citation
+
+See `CITATION.cff`, or use GitHub's "Cite this repository" button.
 
 ## Licence
 
