@@ -114,6 +114,8 @@ python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G
     -o results/genotype_errors.csv --summary results/genotype_join.txt \
     --pairs-out data/derived/genotype_pairs.csv
 python analysis/genotype_diff.py data/derived/genotype_pairs.csv -o results/genotype_diff.csv
+python analysis/genotype_diff.py data/derived/genotype_pairs.csv --i-as drop -o results/genotype_diff_s_r.csv
+python analysis/genotype_diff.py data/derived/genotype_pairs.csv --i-as r -o results/genotype_diff_i_as_r.csv
 # sensitivity: every pair labelled under each version
 python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G \
     -o results/genotype_errors_unmatched.csv --summary results/genotype_join_unmatched.txt
@@ -139,6 +141,8 @@ G2="${G/kpneumoniae_genomes.csv/ncbi_ast_genomes.csv}"; G2="${G2/data\/bvbrc\//d
 python analysis/genotype_errors.py $R $G2 --matched -o results/ncbi/genotype_errors.csv \
     --summary results/ncbi/genotype_join.txt --pairs-out data/derived/ncbi_genotype_pairs.csv
 python analysis/genotype_diff.py data/derived/ncbi_genotype_pairs.csv -o results/ncbi/genotype_diff.csv
+python analysis/genotype_diff.py data/derived/ncbi_genotype_pairs.csv --i-as drop -o results/ncbi/genotype_diff_s_r.csv
+python analysis/genotype_diff.py data/derived/ncbi_genotype_pairs.csv --i-as r -o results/ncbi/genotype_diff_i_as_r.csv
 python analysis/genotype_errors.py $R $G2 -o results/ncbi/genotype_errors_unmatched.csv \
     --summary results/ncbi/genotype_join_unmatched.txt
 ```

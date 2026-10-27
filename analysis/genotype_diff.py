@@ -1,22 +1,36 @@
 """Paired change in genotype-predictor error rates between two EUCAST versions.
 
     python analysis/genotype_diff.py data/derived/genotype_pairs.csv -o results/genotype_diff.csv
+    python analysis/genotype_diff.py data/derived/genotype_pairs.csv --i-as drop \
+        -o results/genotype_diff_s_r.csv
 
 Input: the --pairs-out file of analysis/genotype_errors.py run with --matched,
-so every genome-drug pair is labelled under both versions and the predictions
-are identical; only the phenotype label differs.
+so every genome-drug pair is labelled under both versions and the prediction is
+identical; only the phenotype label differs.
 
-For each antibiotic (and ALL), between the first and last version:
+Error definitions are operational, for a binary (resistant / not resistant)
+predictor. By default EUCAST I ("susceptible, increased exposure") is grouped with
+S as not resistant. Sensitivity analyses: --i-as r groups I with R (non-susceptible
+versus susceptible); --i-as drop leaves out pairs labelled I under either version,
+so every remaining pair is S or R under both. The testing family is the antibiotics
+whose labels change between the versions (after dropping, under drop).
 
-    very major error rate  VME / phenotype R          (I counted as not resistant)
-    major error rate       ME  / phenotype S or I
-    difference (b - a)     with a 95% percentile interval from a bootstrap that
-                           resamples genomes (2,000 replicates, fixed seed), so
-                           pairs from the same genome stay together
-    discordant pairs       pairs that are an error (VME or ME) under one version
-                           and correct under the other, with an exact two-sided
-                           McNemar test of whether errors are as likely to appear
-                           as to disappear
+Three estimands per antibiotic (and ALL), between the first and last version,
+each a difference (b - a):
+
+    very major error rate  VME / phenotype R           denominator changes with the labels
+    major error rate       ME  / phenotype not R       denominator changes with the labels
+    overall error rate     (VME + ME) / all pairs      fixed denominator; the estimand of
+                                                       the exact McNemar test on pairs that
+                                                       change error status
+
+Intervals: 95% percentile intervals from a bootstrap that resamples genomes
+(2,000 replicates, fixed seed). ALL is the primary, pooled analysis.
+Drug-level results are exploratory. The testing family is the antibiotics with at
+least one pair whose label changes between the two versions (for the others every
+difference is zero by construction); for them the output also gives Holm-adjusted
+McNemar p-values and Bonferroni-adjusted intervals over the family's estimands
+(3 per antibiotic), computed as estimate +/- z * bootstrap standard error.
 
 Counts and rates only.
 """
@@ -29,16 +43,19 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+from statistics import NormalDist
+
 import numpy as np
 
 REPLICATES = 2000
 SEED = 20261027
-COLUMNS = [
-    "antibiotic", "version_a", "version_b", "pairs", "genomes",
-    "vme_a", "r_a", "vme_rate_a", "vme_b", "r_b", "vme_rate_b", "vme_diff", "vme_diff_lo", "vme_diff_hi",
-    "me_a", "notr_a", "me_rate_a", "me_b", "notr_b", "me_rate_b", "me_diff", "me_diff_lo", "me_diff_hi",
-    "error_to_correct", "correct_to_error", "mcnemar_p",
-]
+MEASURES = ("vme", "me", "err")
+COLUMNS = (
+    ["antibiotic", "version_a", "version_b", "pairs", "genomes"]
+    + [f"{m}_{x}" for m in MEASURES for x in ("num_a", "den_a", "rate_a", "num_b", "den_b", "rate_b",
+                                               "diff", "lo", "hi", "lo_adj", "hi_adj")]
+    + ["error_to_correct", "correct_to_error", "mcnemar_p", "mcnemar_p_holm"]
+)
 
 
 def _vkey(v):
@@ -54,11 +71,21 @@ def mcnemar_exact(b: int, c: int) -> float:
     logs = [math.lgamma(n + 1) - math.lgamma(i + 1) - math.lgamma(n - i + 1) - n * math.log(2)
             for i in range(k + 1)]
     m = max(logs)
-    tail = math.exp(m) * sum(math.exp(x - m) for x in logs)
-    return min(1.0, 2 * tail)
+    return min(1.0, 2 * math.exp(m) * sum(math.exp(x - m) for x in logs))
+
+
+def holm(pvalues: list[float]) -> list[float]:
+    """Holm step-down adjusted p-values, in the input order."""
+    order = sorted(range(len(pvalues)), key=lambda i: pvalues[i])
+    adj, running = [0.0] * len(pvalues), 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (len(pvalues) - rank) * pvalues[i]))
+        adj[i] = running
+    return adj
 
 
 def error(pred: int, cat: str) -> str:
+    """Operational errors for a binary predictor; I counts as not resistant."""
     if cat == "R":
         return "vme" if not pred else ""
     return "me" if pred else ""
@@ -68,19 +95,32 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("pairs")
     p.add_argument("-o", "--output", required=True)
+    p.add_argument("--i-as", choices=("not_r", "r", "drop"), default="not_r",
+                   help="how phenotype I enters the binary outcome: not_r (default; grouped with S), "
+                        "r (grouped with R, i.e. non-susceptible), or drop (pairs labelled I under "
+                        "either version are left out)")
     p.add_argument("--replicates", type=int, default=REPLICATES)
     a = p.parse_args(argv)
 
     lab = defaultdict(dict)       # (genome, antibiotic) -> version -> (pred, cat)
     with open(a.pairs, newline="", encoding="utf-8") as fh:
         for r in csv.DictReader(fh):
-            lab[(r["genome_id"], r["antibiotic"])][r["eucast_version"]] = (int(r["predicted_resistant"]), r["phenotype"])
+            lab[(r["genome_id"], r["antibiotic"])][r["eucast_version"]] = (int(r["predicted_resistant"]),
+                                                                          r["phenotype"])
     versions = sorted({v for d in lab.values() for v in d}, key=_vkey)
     va, vb = versions[0], versions[-1]
     pairs = {k: d for k, d in lab.items() if va in d and vb in d}
-    unpaired = len(lab) - len(pairs)
     if any(d[va][0] != d[vb][0] for d in pairs.values()):
         raise SystemExit("predictions differ between versions; expected a fixed predictor")
+    changed = {ab for (g, ab), d in pairs.items() if d[va][1] != d[vb][1]}
+    dropped_i = 0
+    if a.i_as == "drop":
+        before = len(pairs)
+        pairs = {k: d for k, d in pairs.items() if d[va][1] != "I" and d[vb][1] != "I"}
+        dropped_i = before - len(pairs)
+        changed = {ab for (g, ab), d in pairs.items() if d[va][1] != d[vb][1]}
+    elif a.i_as == "r":
+        pairs = {k: {v: (pr, "R" if c == "I" else c) for v, (pr, c) in d.items()} for k, d in pairs.items()}
 
     genomes = sorted({g for g, _ in pairs})
     gi = {g: i for i, g in enumerate(genomes)}
@@ -92,50 +132,74 @@ def main(argv=None) -> int:
     for (g, ab), d in pairs.items():
         by_ab[ab].append((g, d))
         by_ab["ALL"].append((g, d))
+    names = ["ALL"] + sorted(k for k in by_ab if k != "ALL")
 
-    rows = []
-    for ab in ["ALL"] + sorted(k for k in by_ab if k != "ALL"):
-        # per-genome counts: vme_a, r_a, vme_b, r_b, me_a, notr_a, me_b, notr_b
-        m = np.zeros((len(genomes), 8))
+    results = {}
+    for ab in names:
+        # per-genome counts, columns: (num_a, den_a, num_b, den_b) for vme, me, err
+        m = np.zeros((len(genomes), 12))
         b = c = 0
         for g, d in by_ab[ab]:
             (pa, ca), (pb, cb) = d[va], d[vb]
-            i = gi[g]
-            ea, eb = error(pa, ca), error(pb, cb)
-            m[i, 0] += ea == "vme"; m[i, 1] += ca == "R"; m[i, 2] += eb == "vme"; m[i, 3] += cb == "R"
-            m[i, 4] += ea == "me"; m[i, 5] += ca != "R"; m[i, 6] += eb == "me"; m[i, 7] += cb != "R"
+            i, ea, eb = gi[g], error(pa, ca), error(pb, cb)
+            m[i] += [ea == "vme", ca == "R", eb == "vme", cb == "R",
+                     ea == "me", ca != "R", eb == "me", cb != "R",
+                     bool(ea), 1, bool(eb), 1]
             b += bool(ea) and not eb
             c += bool(eb) and not ea
-        tot = m.sum(axis=0)
-        boot = w @ m
-        with np.errstate(invalid="ignore", divide="ignore"):
-            vme_d = boot[:, 2] / boot[:, 3] - boot[:, 0] / boot[:, 1]
-            me_d = boot[:, 6] / boot[:, 7] - boot[:, 4] / boot[:, 5]
+        tot, boot = m.sum(axis=0), w @ m
+        est = {}
+        for j, name in enumerate(MEASURES):
+            na, da, nb, db = tot[4 * j: 4 * j + 4]
+            with np.errstate(invalid="ignore", divide="ignore"):
+                diffs = boot[:, 4 * j + 2] / boot[:, 4 * j + 3] - boot[:, 4 * j] / boot[:, 4 * j + 1]
+            ra = na / da if da else math.nan
+            rb = nb / db if db else math.nan
+            est[name] = (na, da, ra, nb, db, rb, rb - ra, diffs[np.isfinite(diffs)])
+        results[ab] = (len(by_ab[ab]), len({g for g, _ in by_ab[ab]}), est, b, c, mcnemar_exact(b, c))
 
-        def rate(k, n):
-            return k / n if n else float("nan")
+    # testing family: antibiotics with at least one pair whose label changes; for the
+    # others every difference is zero by construction and nothing is tested
+    drugs = [ab for ab in names if ab != "ALL" and ab in changed]
+    n_tests = 3 * len(drugs)
+    alpha_adj = 0.05 / n_tests if n_tests else 0.05
+    z_adj = NormalDist().inv_cdf(1 - alpha_adj / 2)
+    holm_p = dict(zip(drugs, holm([results[ab][5] for ab in drugs])))
 
-        def ci(x):
-            x = x[np.isfinite(x)]
-            return (np.percentile(x, 2.5), np.percentile(x, 97.5)) if len(x) else (float("nan"),) * 2
+    def ci(x):
+        if len(x) == 0:
+            return math.nan, math.nan
+        return float(np.percentile(x, 2.5)), float(np.percentile(x, 97.5))
 
-        va_r, vb_r = rate(tot[0], tot[1]), rate(tot[2], tot[3])
-        ma_r, mb_r = rate(tot[4], tot[5]), rate(tot[6], tot[7])
-        f = lambda x: f"{x:.4f}"  # noqa: E731
-        rows.append([ab, va, vb, len(by_ab[ab]), len({g for g, _ in by_ab[ab]}),
-                     int(tot[0]), int(tot[1]), f(va_r), int(tot[2]), int(tot[3]), f(vb_r), f(vb_r - va_r),
-                     *map(f, ci(vme_d)),
-                     int(tot[4]), int(tot[5]), f(ma_r), int(tot[6]), int(tot[7]), f(mb_r), f(mb_r - ma_r),
-                     *map(f, ci(me_d)),
-                     b, c, f"{mcnemar_exact(b, c):.3g}"])
+    def ci_adj(d, x):
+        """Bonferroni interval: estimate +/- z * bootstrap SE (stable at small tail areas)."""
+        if len(x) < 2 or math.isnan(d):
+            return math.nan, math.nan
+        se = float(np.std(x, ddof=1))
+        return d - z_adj * se, d + z_adj * se
+
+    f = lambda x: "" if isinstance(x, float) and math.isnan(x) else f"{x:.4f}"  # noqa: E731
+    rows = []
+    for ab in names:
+        n, ng, est, b, c, pval = results[ab]
+        row = [ab, va, vb, n, ng]
+        for name in MEASURES:
+            na, da, ra, nb, db, rb, d, diffs = est[name]
+            lo, hi = ci(diffs)
+            lo2, hi2 = ci_adj(d, diffs) if ab in holm_p else (math.nan, math.nan)
+            row += [int(na), int(da), f(ra), int(nb), int(db), f(rb), f(d), f(lo), f(hi), f(lo2), f(hi2)]
+        row += [b, c, f"{pval:.3g}", f"{holm_p[ab]:.3g}" if ab in holm_p else ""]
+        rows.append(row)
 
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     with open(a.output, "w", newline="", encoding="utf-8") as fh:
         wr = csv.writer(fh, lineterminator="\n")
         wr.writerow(COLUMNS)
         wr.writerows(rows)
-    print(f"wrote {a.output}: v{va} vs v{vb}, {len(pairs)} pairs ({unpaired} unpaired left out), "
-          f"{a.replicates} genome resamples, seed {SEED}")
+    print(f"wrote {a.output}: v{va} vs v{vb}, {len(pairs)} pairs"
+          + f"; I as {a.i_as}" + (f" ({dropped_i} pairs with I left out)" if a.i_as == "drop" else "")
+          + f"; testing family {len(drugs)} antibiotics with a label change, {n_tests} estimands "
+          f"(Bonferroni intervals at {100 * (1 - alpha_adj):.2f}%); {a.replicates} genome resamples, seed {SEED}")
     return 0
 
 
