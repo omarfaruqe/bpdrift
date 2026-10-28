@@ -21,6 +21,14 @@ if [ -n "$(git status --porcelain -- results/)" ]; then
 fi
 
 step() { printf '\n== %s\n' "$*"; }
+step "environment"
+echo "commit $(git rev-parse --short HEAD) ($(git describe --tags --always 2>/dev/null)), $(date -u +%Y-%m-%dT%H:%M:%SZ), $(uname -sm)"
+$PY -c 'import platform, importlib.metadata as m
+print("Python", platform.python_version())
+for p in ("numpy", "matplotlib", "openpyxl", "pytest"):
+    print(p, m.version(p))'
+echo "(the verified runs used the versions pinned in requirements-repro.txt)"
+
 step "inputs against $MANIFEST"
 $PY analysis/inputs_manifest.py data --check "$MANIFEST" || exit 2
 

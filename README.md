@@ -90,7 +90,9 @@ genes are reviewable CSVs in `mappings/`.
 With the inputs in place, `bash scripts/reproduce.sh` first checks every input against
 `results/table_s1_inputs.csv` (path, size and SHA-256; no filesystem dates), then runs the tests
 and every step below, and finally checks that each committed file in `results/` is regenerated
-byte for byte. To check the inputs alone: `python analysis/inputs_manifest.py data --check
+byte for byte. Byte-identical results are expected with the versions in
+`requirements-repro.txt` (Python 3.10); other NumPy or Matplotlib versions can change bootstrap
+intervals in the last digit or figure files. To check the inputs alone: `python analysis/inputs_manifest.py data --check
 results/table_s1_inputs.csv`.
 
 Inputs are downloaded, not committed: EUCAST tables by hand into
