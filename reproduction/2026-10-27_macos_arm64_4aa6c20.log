@@ -1,0 +1,63 @@
+
+== environment
+commit 4aa6c20 (analysis-freeze-2026-10-27-6-g4aa6c20), 2026-10-28T02:23:06Z, Darwin arm64
+Python 3.10.22
+numpy 2.2.6
+matplotlib 3.10.9
+openpyxl 3.1.5
+pytest 9.1.1
+(the verified runs used the versions pinned in requirements-repro.txt)
+
+== inputs against results/table_s1_inputs.csv
+inputs match results/table_s1_inputs.csv: 20 files, sizes, SHA-256, sources and versions identical
+
+== tests
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+........................................................................ [ 94%]
+....................                                                     [100%]
+380 passed in 5.43s
+
+== BV-BRC cohort
+read 85291 lines: 62333 MIC records, excluded 21815 without a value, 568 not MIC, 575 duplicates
+interpreted 52641 records under 7 versions (8.1, 9.0, 10.0, 13.1, 14.0, 15.0, 16.1): 368487 rows; 9692 records in 29 unlinked antibiotics
+main analysis categories: I 8485, NO_BREAKPOINT 3924, R 219778, S 86843, UNDECIDABLE 15598
+wrote data/derived/kpneumoniae_reinterpreted.csv
+wrote results/flip_rates.csv
+wrote results/as_reported.csv
+wrote results/robustness.csv and results/transitions.csv; genome-drug pairs dropped for disagreeing records: 0; bootstrap: 2000 genome resamples, seed 20261027
+wrote results/by_source.csv: 22 sources, 10 antibiotics with changes
+wrote results/genotype_errors.csv and results/genotype_join.txt
+wrote results/genotype_errors_unmatched.csv and results/genotype_join_unmatched.txt
+wrote results/genotype_diff.csv: v8.1 vs v16.1, 41535 pairs; I as not_r; testing family (changed): 9 antibiotics, Holm over 9 McNemar tests, Bonferroni over 27 interval estimates (Bonferroni intervals at 99.81%); 2000 genome resamples, seed 20261027
+wrote results/genotype_diff_s_r.csv: v8.1 vs v16.1, 39649 pairs; I as drop (1886 pairs with I left out); testing family (changed): 1 antibiotics, Holm over 1 McNemar tests, Bonferroni over 3 interval estimates (Bonferroni intervals at 98.33%); 2000 genome resamples, seed 20261027
+wrote results/genotype_diff_i_as_r.csv: v8.1 vs v16.1, 41535 pairs; I as r; testing family (changed): 9 antibiotics, Holm over 9 McNemar tests, Bonferroni over 27 interval estimates (Bonferroni intervals at 99.81%); 2000 genome resamples, seed 20261027
+wrote results/genotype_diff_family_all.csv: v8.1 vs v16.1, 41535 pairs; I as not_r; testing family (all): 24 antibiotics, Holm over 24 McNemar tests, Bonferroni over 72 interval estimates (Bonferroni intervals at 99.93%); 2000 genome resamples, seed 20261027
+
+== NCBI replication cohort
+wrote data/derived/ncbi_ast_bvbrc_format.csv, data/derived/ncbi_ast_genomes.csv and results/ncbi/cohort.txt
+read 26355 lines: 24959 MIC records, excluded 0 without a value, 1396 not MIC, 0 duplicates
+interpreted 18816 records under 7 versions (8.1, 9.0, 10.0, 13.1, 14.0, 15.0, 16.1): 131712 rows; 6143 records in 50 unlinked antibiotics
+main analysis categories: I 4548, NO_BREAKPOINT 1297, R 68287, S 38567, UNDECIDABLE 5181
+wrote data/derived/ncbi_reinterpreted.csv
+wrote results/ncbi/flip_rates.csv
+wrote results/ncbi/as_reported.csv
+wrote results/ncbi/robustness.csv and results/ncbi/transitions.csv; genome-drug pairs dropped for disagreeing records: 0; bootstrap: 2000 genome resamples, seed 20261027
+wrote results/ncbi/genotype_errors.csv and results/ncbi/genotype_join.txt
+wrote results/ncbi/genotype_errors_unmatched.csv and results/ncbi/genotype_join_unmatched.txt
+wrote results/ncbi/genotype_diff.csv: v8.1 vs v16.1, 14200 pairs; I as not_r; testing family (changed): 8 antibiotics, Holm over 8 McNemar tests, Bonferroni over 24 interval estimates (Bonferroni intervals at 99.79%); 2000 genome resamples, seed 20261027
+wrote results/ncbi/genotype_diff_s_r.csv: v8.1 vs v16.1, 13326 pairs; I as drop (874 pairs with I left out); testing family (changed): 1 antibiotics, Holm over 1 McNemar tests, Bonferroni over 3 interval estimates (Bonferroni intervals at 98.33%); 2000 genome resamples, seed 20261027
+wrote results/ncbi/genotype_diff_i_as_r.csv: v8.1 vs v16.1, 14200 pairs; I as r; testing family (changed): 8 antibiotics, Holm over 8 McNemar tests, Bonferroni over 24 interval estimates (Bonferroni intervals at 99.79%); 2000 genome resamples, seed 20261027
+wrote results/ncbi/genotype_diff_family_all.csv: v8.1 vs v16.1, 14200 pairs; I as not_r; testing family (all): 21 antibiotics, Holm over 21 McNemar tests, Bonferroni over 63 interval estimates (Bonferroni intervals at 99.92%); 2000 genome resamples, seed 20261027
+
+== figures
+wrote figures to results/figures
+
+== comparison with the committed results
+    results/figures/figure1_change_heatmap.png: pixel-identical (PNG encoding differs)
+    results/figures/figure2_reported_agreement.png: pixel-identical (PNG encoding differs)
+    results/figures/figure3_genotype_errors.png: pixel-identical (PNG encoding differs)
+    results/figures/figureS1_flip_rates.png: pixel-identical (PNG encoding differs)
+REPRODUCED: all 35 committed result files match (4aa6c20): 31 byte-identical, 4 PNG figures pixel-identical
