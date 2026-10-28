@@ -78,3 +78,13 @@ def test_every_complete_breakpoint_interprets(table):
             low = interpret(f"<={bp.s_le:g}", bp).category
             high = interpret(f">{bp.r_gt:g}", bp).category
             assert low is Category.S and high is Category.R, r.cell
+
+
+def test_atu_only_where_the_table_has_an_atu_column(table):
+    """v8.1 predates the ATU column (its column D holds disk contents); later versions have one."""
+    path, t = table
+    atus = [r.atu for r in t.rows if r.atu]
+    if filename_version(path) == "8.1":
+        assert atus == []
+    else:
+        assert atus, "expected some ATU entries from v9.0 on"

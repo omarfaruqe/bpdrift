@@ -238,3 +238,17 @@ def test_not_a_eucast_table(tmp_path):
     openpyxl.Workbook().save(path)
     with pytest.raises(EucastFormatError):
         read_eucast_xlsx(path)
+
+
+def test_column_d_is_atu_only_under_an_atu_header(tmp_path):
+    path = tmp_path / "v_8.1_Breakpoint_Tables.xlsx"
+    build(path, version="8.1")
+    wb = openpyxl.load_workbook(path, rich_text=True)   # keep the superscript footnote runs
+    for ws in wb.worksheets:
+        for c in ws["D"]:
+            if c.value == "ATU":
+                c.value = None                      # v8.1 layout: no ATU column
+                ws.cell(c.row - 1, 4, "Disk content (µg)")
+    wb.save(path)
+    t = read_eucast_xlsx(path)
+    assert t.rows and all(r.atu == "" for r in t.rows)

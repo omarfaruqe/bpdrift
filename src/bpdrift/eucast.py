@@ -215,6 +215,8 @@ def _read_sheet(ws) -> list[MICRow]:
                 f"got {s_label!r} / {r_label!r}"
             )
         drug_class = _split(ws.cell(hdr_row, 1).value)[0].strip()
+        # the ATU column exists from v9.0 on; v8.1 has the disk content in column D instead
+        has_atu = _split(ws.cell(hdr_row + 1, 4).value)[0].strip().upper() == "ATU"
 
         r = hdr_row + 2
         # some versions (v8.1) leave a blank spacer row under the S/R header
@@ -237,7 +239,7 @@ def _read_sheet(ws) -> list[MICRow]:
                     agent_notes=agent_notes,
                     s=_parse_value(ws.cell(r, 2).value, f"{ws.title}!B{r}"),
                     r=_parse_value(ws.cell(r, 3).value, f"{ws.title}!C{r}"),
-                    atu=_split(ws.cell(r, 4).value)[0].strip(),
+                    atu=_split(ws.cell(r, 4).value)[0].strip() if has_atu else "",
                     row=r,
                     subgroup=subgroup,
                 )
