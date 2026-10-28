@@ -1,6 +1,8 @@
 # bpdrift
 
 [![tests](https://github.com/omarfaruqe/bpdrift/actions/workflows/tests.yml/badge.svg)](https://github.com/omarfaruqe/bpdrift/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/bpdrift.svg)](https://pypi.org/project/bpdrift/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23736620.svg)](https://doi.org/10.5281/zenodo.23736620)
 
 Interpret minimum inhibitory concentration (MIC) values as S / I / R under a
 specific, pinned version of the EUCAST clinical breakpoint tables, and report
@@ -17,6 +19,12 @@ where two versions disagree.
 - **Fail loudly on ambiguity.** Unparseable input raises an error.
 
 ## Install
+
+```bash
+pip install bpdrift                # released package, from PyPI
+```
+
+From a clone, for development or to rerun the analysis:
 
 ```bash
 pip install -e ".[dev]"          # library, CLI and tests
@@ -166,7 +174,11 @@ breakpoint table says about an MIC, not what to treat with.
 
 ## Citation
 
-See `CITATION.cff`, or use GitHub's "Cite this repository" button.
+Each release is archived on Zenodo. To cite bpdrift in general, use the
+all-versions DOI [10.5281/zenodo.23736620](https://doi.org/10.5281/zenodo.23736620);
+to cite version 0.1.0 specifically, use
+[10.5281/zenodo.23736621](https://doi.org/10.5281/zenodo.23736621).
+See also `CITATION.cff`, or GitHub's "Cite this repository" button.
 
 ## Licence
 

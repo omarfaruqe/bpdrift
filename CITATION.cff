@@ -8,7 +8,15 @@ authors:
     email: faruqe@ru.ac.bd
     affiliation: "Department of Computer Science and Engineering, University of Rajshahi"
 version: 0.1.0
-date-released: 2026-10-27
+date-released: 2026-10-28
+doi: 10.5281/zenodo.23736620
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23736620
+    description: "All versions (resolves to the latest)"
+  - type: doi
+    value: 10.5281/zenodo.23736621
+    description: "Version 0.1.0"
 license: MIT
 repository-code: "https://github.com/omarfaruqe/bpdrift"
 keywords:
