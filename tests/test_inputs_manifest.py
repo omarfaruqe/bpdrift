@@ -65,3 +65,19 @@ def test_check(tmp_path, capsys):
     assert "checksum differs: data/bvbrc/amr.csv" in out
     assert "missing: data/ncbi/PDG000000012.1.metadata.tsv" in out
     assert "not in the manifest: data/ncbi/PDG000000012.2.metadata.tsv" in out
+
+
+def test_check_metadata_columns(tmp_path, capsys):
+    data = make_data(tmp_path)
+    manifest = tmp_path / "s1.csv"
+    inputs_manifest.main([str(data), "-o", str(manifest)])
+    rows = list(csv.DictReader(manifest.open(encoding="utf-8")))
+    for r in rows:
+        if r["path"].endswith("v_16.1_Breakpoint_Tables.xlsx"):
+            r["version"] = "v15.0"                       # edited by hand: wrong version
+    with manifest.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=inputs_manifest.COLUMNS, lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+    assert inputs_manifest.main([str(data), "--check", str(manifest)]) == 1
+    assert "metadata differs: data/breakpoints/v_16.1_Breakpoint_Tables.xlsx" in capsys.readouterr().out

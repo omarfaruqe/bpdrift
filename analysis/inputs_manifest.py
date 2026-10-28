@@ -13,7 +13,8 @@ an identical table wherever and whenever they were downloaded. Retrieval dates
 are stated in the paper's Methods.
 
 --check verifies the inputs present under data/ against a committed table:
-every listed file must exist with the same size and checksum, and no unlisted
+every listed file must exist with the same size and checksum, its source and
+version columns must match what is derived from the file now, and no unlisted
 file may sit in a listed folder (it could change what a glob in the pipeline
 picks up). Exit status 0 when everything matches, 1 otherwise, with each
 problem listed.
@@ -89,6 +90,11 @@ def check(root: Path, manifest: str) -> int:
             problems.append(f"size differs: {path} ({f.stat().st_size} bytes, expected {r['bytes']})")
         elif sha256_of(f) != r["sha256"]:
             problems.append(f"checksum differs: {path}")
+        else:
+            source, version = describe(f, f.parent.relative_to(root).as_posix())
+            if (source, version) != (r["source"], r["version"]):
+                problems.append(f"metadata differs: {path} (manifest: {r['source']!r}, {r['version']!r}; "
+                                f"file: {source!r}, {version!r})")
     for f in inputs(root):
         if rel(f, root) not in listed:
             problems.append(f"not in the manifest: {rel(f, root)}")
@@ -97,7 +103,7 @@ def check(root: Path, manifest: str) -> int:
         for p in problems:
             print(f"    {p}")
         return 1
-    print(f"inputs match {manifest}: {len(listed)} files, sizes and SHA-256 identical")
+    print(f"inputs match {manifest}: {len(listed)} files, sizes, SHA-256, sources and versions identical")
     return 0
 
 
