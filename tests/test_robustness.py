@@ -55,6 +55,7 @@ def test_record_level(result):
     # records 1, 2, 4, 5, 6 decidable under both; 1, 2, 5, 6 flip
     assert (r["units"], r["genomes"], r["flips"], r["r_line_flips"]) == ("5", "3", "4", "4")
     assert r["boot_lo"] != "" and float(r["boot_lo"]) <= 0.8 <= float(r["boot_hi"])
+    assert 0 < int(r["boot_valid"]) <= 200
 
 
 def test_genome_level_collapses_and_drops_conflicts(result):

@@ -16,7 +16,9 @@ both versions of a pair (paired comparison, so a pair's denominator is fixed):
 
 Intervals: Wilson score 95% intervals, and percentile 95% intervals from a
 bootstrap that resamples genomes (2,000 replicates, fixed seed), which allows
-for several records from the same genome. One joint resample of genomes is
+for several records from the same genome. Bootstrap sums are exact integer
+arithmetic; boot_valid counts the replicates with a defined rate (at least one
+decidable unit drawn). One joint resample of genomes is
 used for every antibiotic and version pair.
 
 Outputs counts and rates only; no breakpoint values are written.
@@ -43,7 +45,7 @@ SEED = 20261027
 COLUMNS = [
     "scenario", "antibiotic", "version_a", "version_b", "units", "genomes", "flips", "flip_rate",
     "wilson_lo", "wilson_hi", "boot_lo", "boot_hi", "r_line_flips", "r_line_rate",
-    "r_line_boot_lo", "r_line_boot_hi",
+    "r_line_boot_lo", "r_line_boot_hi", "boot_valid",
 ]
 TRANSITION_COLUMNS = ["scenario", "antibiotic", "version_a", "version_b", "from", "to", "units"]
 
@@ -129,8 +131,8 @@ def main(argv=None) -> int:
     gidx = {g: i for i, g in enumerate(genomes)}
     rng = np.random.default_rng(SEED)
     # joint genome resample: weight = how many times each genome is drawn
-    weights = rng.multinomial(len(genomes), np.full(len(genomes), 1 / len(genomes)),
-                              size=a.replicates).astype(np.float32)
+    # integer weights; sums in exact int64 arithmetic (no floating-point BLAS)
+    weights = rng.multinomial(len(genomes), np.full(len(genomes), 1 / len(genomes)), size=a.replicates)
     pairs = list(zip(versions, versions[1:]))
     if (versions[0], versions[-1]) not in pairs:
         pairs.append((versions[0], versions[-1]))
@@ -155,7 +157,7 @@ def main(argv=None) -> int:
                     for (x, y), k in sorted(trans.items()):
                         trans_rows.append([scenario, name, va, vb, x, y, k])
                     for c in (n, f, rl):
-                        v = np.zeros(len(genomes), dtype=np.float32)
+                        v = np.zeros(len(genomes), dtype=np.int64)
                         for g, k in c.items():
                             v[gidx[g]] = k
                         vecs.append(v)
@@ -165,7 +167,9 @@ def main(argv=None) -> int:
                 meta.append((name, va, vb, tot, len(n), flips, rls, boot))
         boot_ci = {}
         if vecs:
-            sums = weights @ np.stack(vecs, axis=1)          # replicates x (3 per stratum-pair)
+            sums = np.einsum("rg,gk->rk", weights, np.stack(vecs, axis=1))  # replicates x (3 per stratum-pair)
+            if sums.min() < 0:
+                raise SystemExit("negative bootstrap count; integer overflow?")
             j = 0
             for name, va, vb, *_rest, boot in meta:
                 if not boot:
@@ -174,14 +178,15 @@ def main(argv=None) -> int:
                 j += 3
                 with np.errstate(invalid="ignore", divide="ignore"):
                     fr, rr = f_b / n_b, r_b / n_b
-                boot_ci[(name, va, vb)] = (*np.nanpercentile(fr, [2.5, 97.5]), *np.nanpercentile(rr, [2.5, 97.5]))
+                boot_ci[(name, va, vb)] = (*np.nanpercentile(fr, [2.5, 97.5]), *np.nanpercentile(rr, [2.5, 97.5]),
+                                           int(np.isfinite(fr).sum()))
         for name, va, vb, tot, ng, flips, rls, boot in meta:
             fr, lo, hi = wilson(flips, tot)
             b = boot_ci.get((name, va, vb))
             fmt = (lambda x: f"{x:.4f}")
-            bf = [fmt(x) for x in b] if b else ["", "", "", ""]
+            bf = [fmt(x) for x in b[:4]] if b else ["", "", "", ""]
             out_rows.append([scenario, name, va, vb, tot, ng, flips, fmt(fr), fmt(lo), fmt(hi),
-                             bf[0], bf[1], rls, fmt(rls / tot), bf[2], bf[3]])
+                             bf[0], bf[1], rls, fmt(rls / tot), bf[2], bf[3], b[4] if b else ""])
 
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     with open(a.output, "w", newline="", encoding="utf-8") as fh:

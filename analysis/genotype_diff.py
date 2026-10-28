@@ -25,7 +25,9 @@ each a difference (b - a):
                                                        change error status
 
 Intervals: 95% percentile intervals from a bootstrap that resamples genomes
-(2,000 replicates, fixed seed). ALL is the primary, pooled analysis.
+(2,000 replicates, fixed seed). Bootstrap sums are exact integer arithmetic.
+<measure>_boot_valid is the number of replicates in which both rates are defined
+(a replicate that draws no isolates in a denominator gives no estimate). ALL is the primary, pooled analysis.
 Drug-level results are exploratory. Two multiplicity families are used, both over
 the same set of antibiotics:
 
@@ -61,7 +63,7 @@ MEASURES = ("vme", "me", "err")
 COLUMNS = (
     ["antibiotic", "version_a", "version_b", "pairs", "genomes"]
     + [f"{m}_{x}" for m in MEASURES for x in ("num_a", "den_a", "rate_a", "num_b", "den_b", "rate_b",
-                                               "diff", "lo", "hi", "lo_adj", "hi_adj")]
+                                               "diff", "lo", "hi", "lo_adj", "hi_adj", "boot_valid")]
     + ["error_to_correct", "correct_to_error", "mcnemar_p", "mcnemar_p_holm"]
 )
 
@@ -137,8 +139,9 @@ def main(argv=None) -> int:
     genomes = sorted({g for g, _ in pairs})
     gi = {g: i for i, g in enumerate(genomes)}
     rng = np.random.default_rng(SEED)
-    w = rng.multinomial(len(genomes), np.full(len(genomes), 1 / len(genomes)),
-                        size=a.replicates).astype(np.float64)
+    # integer resampling weights; all bootstrap sums are computed in exact int64
+    # arithmetic (no floating-point BLAS), so they are identical on every platform
+    w = rng.multinomial(len(genomes), np.full(len(genomes), 1 / len(genomes)), size=a.replicates)
 
     by_ab = defaultdict(list)
     for (g, ab), d in pairs.items():
@@ -149,7 +152,7 @@ def main(argv=None) -> int:
     results = {}
     for ab in names:
         # per-genome counts, columns: (num_a, den_a, num_b, den_b) for vme, me, err
-        m = np.zeros((len(genomes), 12))
+        m = np.zeros((len(genomes), 12), dtype=np.int64)
         b = c = 0
         for g, d in by_ab[ab]:
             (pa, ca), (pb, cb) = d[va], d[vb]
@@ -159,7 +162,9 @@ def main(argv=None) -> int:
                      bool(ea), 1, bool(eb), 1]
             b += bool(ea) and not eb
             c += bool(eb) and not ea
-        tot, boot = m.sum(axis=0), w @ m
+        tot, boot = m.sum(axis=0), np.einsum("rg,gk->rk", w, m)
+        if boot.min() < 0:
+            raise SystemExit(f"{ab}: negative bootstrap count; integer overflow?")
         est = {}
         for j, name in enumerate(MEASURES):
             na, da, nb, db = tot[4 * j: 4 * j + 4]
@@ -167,6 +172,8 @@ def main(argv=None) -> int:
                 diffs = boot[:, 4 * j + 2] / boot[:, 4 * j + 3] - boot[:, 4 * j] / boot[:, 4 * j + 1]
             ra = na / da if da else math.nan
             rb = nb / db if db else math.nan
+            # a replicate is invalid only when it draws no pairs in a denominator
+            # (rate undefined); the count of valid replicates is reported
             est[name] = (na, da, ra, nb, db, rb, rb - ra, diffs[np.isfinite(diffs)])
         results[ab] = (len(by_ab[ab]), len({g for g, _ in by_ab[ab]}), est, b, c, mcnemar_exact(b, c))
 
@@ -199,7 +206,8 @@ def main(argv=None) -> int:
             na, da, ra, nb, db, rb, d, diffs = est[name]
             lo, hi = ci(diffs)
             lo2, hi2 = ci_adj(d, diffs) if ab in holm_p else (math.nan, math.nan)
-            row += [int(na), int(da), f(ra), int(nb), int(db), f(rb), f(d), f(lo), f(hi), f(lo2), f(hi2)]
+            row += [int(na), int(da), f(ra), int(nb), int(db), f(rb), f(d), f(lo), f(hi), f(lo2), f(hi2),
+                    len(diffs)]
         row += [b, c, f"{pval:.3g}", f"{holm_p[ab]:.3g}" if ab in holm_p else ""]
         rows.append(row)
 

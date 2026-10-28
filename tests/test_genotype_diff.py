@@ -105,3 +105,9 @@ def test_family_all_includes_unchanged_antibiotics(tmp_path):
     # two antibiotics in the family now: Holm doubles alpha's single p-value (capped at 1)
     single = run(tmp_path)["alpha"]
     assert float(res["alpha"]["mcnemar_p_holm"]) == min(1.0, 2 * float(single["mcnemar_p"]))
+
+
+def test_bootstrap_validity_is_reported(tmp_path):
+    r = run(tmp_path)["alpha"]
+    assert 0 < int(r["err_boot_valid"]) <= 200          # overall error: defined unless no pair is drawn
+    assert r["me_boot_valid"] == "0"                     # ME has no denominator under v16.1: never defined

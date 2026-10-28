@@ -14,6 +14,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PYTHON:-python}
 export PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1
+# any numerical RuntimeWarning (overflow, invalid value, division by zero) is an error
+export PYTHONWARNINGS=error::RuntimeWarning
 
 MANIFEST=results/table_s1_inputs.csv
 if [ -n "$(git status --porcelain -- results/)" ]; then
@@ -45,7 +47,7 @@ PD=$(listed '^data/ncbi/PDG.*[.]metadata[.]tsv$')
 mkdir -p data/derived results/ncbi results/figures
 
 step "tests"
-$PY -m pytest -q -p no:cacheprovider
+$PY -m pytest -q -p no:cacheprovider -W error::RuntimeWarning
 
 LINKS=mappings/bvbrc_to_eucast_enterobacterales.csv
 GRP="--group Enterobacterales --group Enterobacteriaceae"
