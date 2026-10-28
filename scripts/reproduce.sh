@@ -95,10 +95,35 @@ step "figures"
 $PY analysis/figures.py results -o results/figures
 
 step "comparison with the committed results"
+# Every result must be byte-identical, except PNG figures: PNG compression differs
+# between builds of the image libraries, so a PNG whose bytes differ is accepted
+# only if its decoded image (size and every pixel) is identical to the committed one.
 CHANGED=$(git status --porcelain -- results/)
 N=$(git ls-files results/ | wc -l | tr -d ' ')
-if [ -z "$CHANGED" ]; then
-    echo "REPRODUCED: all $N committed result files are byte-identical ($(git rev-parse --short HEAD))"
+OTHER=$(printf '%s\n' "$CHANGED" | grep -v '^ M .*[.]png$' | grep . || true)
+PNGS=$(printf '%s\n' "$CHANGED" | grep '^ M .*[.]png$' | sed 's/^ M //' || true)
+if [ -n "$OTHER" ]; then
+    echo "DIFFERENT: these result files changed:"; echo "$OTHER"; exit 1
+fi
+if [ -n "$PNGS" ]; then
+    $PY - $PNGS <<'PYEOF' || exit 1
+import io, subprocess, sys
+from PIL import Image
+bad = []
+for path in sys.argv[1:]:
+    old = Image.open(io.BytesIO(subprocess.run(["git", "show", f"HEAD:{path}"], check=True,
+                                               capture_output=True).stdout)).convert("RGBA")
+    new = Image.open(path).convert("RGBA")
+    same = old.size == new.size and old.tobytes() == new.tobytes()
+    print(f"    {path}: {'pixel-identical (PNG encoding differs)' if same else 'IMAGE DIFFERS'}")
+    if not same:
+        bad.append(path)
+if bad:
+    print("DIFFERENT: these figures differ in content:", *bad)
+    sys.exit(1)
+PYEOF
+    K=$(printf '%s\n' "$PNGS" | grep -c .)
+    echo "REPRODUCED: all $N committed result files match ($(git rev-parse --short HEAD)): $((N - K)) byte-identical, $K PNG figures pixel-identical"
 else
-    echo "DIFFERENT: these result files changed:"; echo "$CHANGED"; exit 1
+    echo "REPRODUCED: all $N committed result files are byte-identical ($(git rev-parse --short HEAD))"
 fi
