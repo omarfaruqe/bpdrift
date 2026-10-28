@@ -93,6 +93,16 @@ $PY analysis/genotype_diff.py $P --i-as drop -o results/ncbi/genotype_diff_s_r.c
 $PY analysis/genotype_diff.py $P --i-as r -o results/ncbi/genotype_diff_i_as_r.csv
 $PY analysis/genotype_diff.py $P --family all -o results/ncbi/genotype_diff_family_all.csv
 
+step "review checks and predictor bounds"
+TABLES=$(listed '^data/breakpoints/.*[.]xlsx$' | by_version | tr '\n' ' ')
+$PY analysis/review_checks.py --bvbrc-re data/derived/kpneumoniae_reinterpreted.csv \
+    --bvbrc-export data/bvbrc/kpneumoniae_amr_all.csv \
+    --ncbi-re data/derived/ncbi_reinterpreted.csv --ncbi-genomes data/derived/ncbi_ast_genomes.csv \
+    --ncbi-export data/derived/ncbi_ast_bvbrc_format.csv --links $LINKS --tables $TABLES \
+    -o results/review_checks.csv
+$PY analysis/predictor_bounds.py data/derived/genotype_pairs.csv -o results/predictor_bounds.csv
+$PY analysis/predictor_bounds.py data/derived/ncbi_genotype_pairs.csv -o results/ncbi/predictor_bounds.csv
+
 step "figures"
 $PY analysis/figures.py results -o results/figures
 

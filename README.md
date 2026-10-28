@@ -130,6 +130,10 @@ python analysis/genotype_errors.py data/derived/kpneumoniae_reinterpreted.csv $G
 python analysis/figures.py results -o results/figures
 ```
 
+Review checks (EUCAST conventions, validation sources, NCBI hosts) and the predictor-independent
+bound: see `analysis/review_checks.py` and `analysis/predictor_bounds.py`; both run in
+`scripts/reproduce.sh`.
+
 Replication cohort (NCBI BioSample antibiograms, BioSamples already in BV-BRC left out):
 
 ```bash
