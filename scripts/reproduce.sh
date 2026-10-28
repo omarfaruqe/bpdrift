@@ -41,6 +41,9 @@ T=""; for f in $(listed '^data/breakpoints/.*[.]xlsx$' | by_version); do T="$T -
 PD=$(listed '^data/ncbi/PDG.*[.]metadata[.]tsv$')
 [ "$(printf '%s\n' "$PD" | grep -c .)" = 1 ] || { echo "manifest must list exactly one PDG metadata file" >&2; exit 2; }
 
+# output folders are not in git (derived data) or may be absent in a fresh clone
+mkdir -p data/derived results/ncbi results/figures
+
 step "tests"
 $PY -m pytest -q -p no:cacheprovider
 
